@@ -14,7 +14,7 @@ Route::post('/change_password', [App\Http\Controllers\Admin\HomeController::clas
 Route::post('/change_password_for_user', [App\Http\Controllers\Admin\HomeController::class, 'change_password_for_user'])->name('change_password_for_user');
 Route::post('/UpdatePerDetails', [App\Http\Controllers\Admin\HomeController::class, 'UpdatePerDetails'])->name('UpdatePerDetails');
 Route::get('/getPersonalDetails/{id}', [App\Http\Controllers\Admin\HomeController::class, 'getPersonalDetails'])->name('getPersonalDetails');
-Route::get('/taskDetails', [App\Http\Controllers\Admin\HomeController::class, 'taskDetails'])->name('taskDetails');
+// Route::get('/taskDetails', [App\Http\Controllers\Admin\HomeController::class, 'taskDetails'])->name('taskDetails');
 Route::get('/getAllSystemUsers', [App\Http\Controllers\Admin\HomeController::class, 'getAllSystemUsers'])->name('getAllSystemUsers');
 
 //deleting user
@@ -24,7 +24,7 @@ Route::get('/DeleteUser/{id}', [App\Http\Controllers\Admin\HomeController::class
 Route::get('/OrgDelete/{id}', [App\Http\Controllers\Admin\HomeController::class, 'OrgDelete'])->name('OrgDelete');
 
 //pulling assign task in notification
-Route::get('/getNotification', [App\Http\Controllers\Admin\HomeController::class, 'getNotification'])->name('getNotification');
+// Route::get('/getNotification', [App\Http\Controllers\Admin\HomeController::class, 'getNotification'])->name('getNotification');
 
 //Checking email while adding by admin
 Route::get('/emailchecking/{email}', [App\Http\Controllers\Admin\HomeController::class, 'emailchecking'])->name('emailchecking');
@@ -38,11 +38,11 @@ Route::post('/add_organization', [App\Http\Controllers\Admin\HomeController::cla
 //loading all organization
 Route::get('/orgListDetails', [App\Http\Controllers\Admin\HomeController::class, 'orgListDetails'])->name('orgListDetails');
 
-//creating create_task
-Route::post('/create_tasks', [App\Http\Controllers\Admin\HomeController::class, 'create_tasks'])->name('create_tasks');
+//creating create_invoice
+Route::post('/create_invoice', [App\Http\Controllers\Admin\HomeController::class, 'create_invoice'])->name('create_invoice');
 
-Route::get('/tasklist', [App\Http\Controllers\Admin\HomeController::class, 'tasklist'])->name('tasklist');
-Route::get('/Assigntasklist', [App\Http\Controllers\Admin\HomeController::class, 'Assigntasklist'])->name('Assigntasklist');
+Route::get('/InvoiceList', [App\Http\Controllers\Admin\HomeController::class, 'InvoiceList'])->name('InvoiceList');
+Route::get('/InvoiceDetails/{id}', [App\Http\Controllers\Admin\HomeController::class, 'InvoiceDetails'])->name('InvoiceDetails');
 Route::get('/tasklistByParams/{params}', [App\Http\Controllers\Admin\HomeController::class, 'tasklistByParams'])->name('tasklistByParams');
 Route::post('/Assign_task/{parameters}', [App\Http\Controllers\Admin\HomeController::class, 'Assign_task'])->name('Assign_task');
 Route::get('/SearchUserByEmail/{params}', [App\Http\Controllers\Admin\HomeController::class, 'SearchUserByEmail'])->name('SearchUserByEmail');

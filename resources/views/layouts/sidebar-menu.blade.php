@@ -53,9 +53,9 @@
                         </router-link>  
                     </li>
                     <li class="nav-item">
-                        <router-link to="/task_index" class="nav-link">
+                        <router-link to="/invoice_index" class="nav-link">
                             <i class="fa fa-users nav-icon text-white"></i>
-                            <p class="text-white"><b>Manage Your Tasks</b></p>
+                            <p class="text-white"><b>Create Billing Invoice</b></p>
                         </router-link>
                     </li>
                     <li class="nav-item">

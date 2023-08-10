@@ -81,7 +81,7 @@
   //refereshing every 500 milisec
   setInterval(function() {
       getNotification();
-    }, 3000);
+    }, 300000);
 
   function logout() {
     Swal.fire({

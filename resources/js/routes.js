@@ -7,13 +7,14 @@ export default [
 
 
     //Creating and listing own task
-    { path: '/task_index',  component: require('./components/Task_creation/task_index.vue').default ,
+    { path: '/invoice_index',  component: require('./components/invoice_creation/invoice_index.vue').default ,
     children:[
-            { path: '/',name:'task_index', component: require('./components/Task_creation/list_task.vue').default },
-            { path: '/list_task',name:'list_task', component: require('./components/Task_creation/list_task.vue').default },
-            { path: '/assigned_list_task',name:'assigned_list_task', component: require('./components/Task_creation/assigned_list_task.vue').default },
-            { path: '/create_tasks',name:'create_tasks', component: require('./components/Task_creation/create_tasks.vue').default },
-            { path: '/edit_task',name:'edit_task', component: require('./components/Task_creation/edit_task.vue').default },
+            { path: '/',name:'invoice_index', component: require('./components/invoice_creation/list_invoice.vue').default },
+            { path: '/list_invoice',name:'list_invoice', component: require('./components/invoice_creation/list_invoice.vue').default },
+            // { path: '/assigned_list_invoice',name:'assigned_list_invoice', component: require('./components/invoice_creation/assigned_list_invoice.vue').default },
+            { path: '/create_invoice',name:'create_invoice', component: require('./components/invoice_creation/create_invoice.vue').default },
+            { path: '/view_invoice',name:'view_invoice', component: require('./components/invoice_creation/view_invoice.vue').default },
+            { path: '/edit_invoice',name:'edit_invoice', component: require('./components/invoice_creation/edit_invoice.vue').default },
         ]
     },
     //Creating user by admin
@@ -37,15 +38,15 @@ export default [
     },
 
     //Reporting interface
-    { path: '/task_index',  component: require('./components/Task_creation/task_index.vue').default ,
-    children:[
-            { path: '/',name:'task_index', component: require('./components/Task_creation/list_task.vue').default },
-            { path: '/list_task',name:'list_task', component: require('./components/Task_creation/list_task.vue').default },
-            { path: '/assigned_list_task',name:'assigned_list_task', component: require('./components/Task_creation/assigned_list_task.vue').default },
-            { path: '/create_tasks',name:'create_tasks', component: require('./components/Task_creation/create_tasks.vue').default },
-            { path: '/edit_task',name:'edit_task', component: require('./components/Task_creation/edit_task.vue').default },
-        ]
-    },
+    // { path: '/task_index',  component: require('./components/Task_creation/task_index.vue').default ,
+    // children:[
+    //         { path: '/',name:'task_index', component: require('./components/Task_creation/list_task.vue').default },
+    //         { path: '/list_task',name:'list_task', component: require('./components/Task_creation/list_task.vue').default },
+    //         { path: '/assigned_list_task',name:'assigned_list_task', component: require('./components/Task_creation/assigned_list_task.vue').default },
+    //         { path: '/create_tasks',name:'create_tasks', component: require('./components/Task_creation/create_tasks.vue').default },
+    //         { path: '/edit_task',name:'edit_task', component: require('./components/Task_creation/edit_task.vue').default },
+    //     ]
+    // },
     //Assigning task
     { path: '/Assign_task_index',  component: require('./components/Task_assigning/Assign_task_index.vue').default ,
     children:[

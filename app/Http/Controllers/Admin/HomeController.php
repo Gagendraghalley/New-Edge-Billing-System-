@@ -11,8 +11,10 @@ use Illuminate\Support\Facades\DB;
 use App\Models\UsersModel;
 use App\Models\UserHistory;
 use App\Models\Organization;
-use App\Models\Task_Details;
-use App\Models\Task_details_history;
+use App\Models\Invoice;
+use App\Models\InvoiceDetails;
+use App\Models\Invoice_history;
+use App\Models\ApplicationSequence;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -152,55 +154,112 @@ class HomeController extends Controller
                 return view('userlogin', ['Invalid' => 'You have registered successfully. Please login with email as username and password you have created, both username and password are sent to your registered email']);
             }
     }
-    public function create_tasks(Request $request){
+    public function create_invoice(Request $request){
             $rules = [
-                'title'             =>  'required',
-                'description'       =>  'required',
-                'priority'          =>  'required',
-                'due_date'          =>  'required',
-                'taskStatus'        =>  'required',
+                'due_date'                  =>  'required',
+                'addressTo'                 =>  'required',
+                'entry_date'                =>  'required',
+                'workorderNo'               =>  'required',
             ];
             $customMessages = [
-                'title.required'        => 'Title is required',
-                'description.required'  => 'Description is required',
-                'priority.required'     => 'Please select priority level',
-                'due_date.required'     => 'Please select due date',
-                'taskStatus.required'   => 'Please select task status',
+                'addressTo.required'        => 'Address To is required',
+                'workorderNo.required'      => 'Work Order No is required',
+                'due_date.required'         => 'Please select Due Date',
+                'entry_date.required'       => 'Please select Entry Date',
             ];
             $this->validate($request, $rules, $customMessages);
+            //generating application number
+            $last_seq=ApplicationSequence::where('service_name','invoice')->first();
+                if($last_seq==null || $last_seq==""){
+                    $last_seq=1;
+                    $app_details = [
+                        'service_name'                  =>  'invoice',
+                        'last_sequence'                 =>  $last_seq,
+                    ];
+                    ApplicationSequence::create($app_details);
+                }
+                else{
+                    $last_seq=$last_seq->last_sequence+1;
+                    $app_details = [
+                        'last_sequence'                 =>  $last_seq,
+                    ];
+                    ApplicationSequence::where('service_name', 'invoice')->update($app_details);
+                }
+
+                $application_no='NET/Invoice/';
+                if(strlen($last_seq)==1){
+                    $application_no= $application_no.date('Y').'/'.date('m').'/000'.$last_seq;
+                }
+                else if(strlen($last_seq)==2){
+                    $application_no= $application_no.date('Y').'/'.date('m').'/00'.$last_seq;
+                }
+                else if(strlen($last_seq)==3){
+                    $application_no= $application_no.date('Y').'/'.date('m').'/0'.$last_seq;
+                }
+                else if(strlen($last_seq)==4){
+                    $application_no= $application_no.date('Y').'/'.date('m').'/'.$last_seq;
+                }
 
             //data preperation for creating tasks
-            $task_details = [
-                'id'                    => $request->input('id'),
-                'title'                 => $request->input('title'),
-                'description'           => $request->input('description'),
-                'priority'              => $request->input('priority'),
-                'due_date'              => $request->input('due_date'),
-                'taskStatus'            => $request->input('taskStatus'),
-                'status'                => $request->input('status'),
-                'userId'                => Session::get('User_details')['id'],
-                'ownership'             => 'Own Task'
-            ];
+                $Invoice = [
+                    'id'                    => $request->input('id'),
+                    'entry_date'            => date('Y-m-d'),
+                    'due_date'              => $request->input('due_date'),
+                    'addressTo'             => $request->input('addressTo'),
+                    'workorderNo'           => $request->input('workorderNo'),
+                    'totalAmount'           => $request->input('totalAmount'),
+                    'totalAmountInWords'    => $request->input('totalAmountInWords'),
+                    'Tpn_no'                => 'NAC00078',
+                    'academic_year'         => date('Y'),
+                    'Bill_no'               => $application_no,
+                    'userId'                => Session::get('User_details')['id'],
+                    'created_by'            => Session::get('User_details')['id'],
+                    'created_at'            =>  date('Y-m-d h:i:s')
+                ];
             if($request->input('action')=='add'){
-                //inserting task details
-                $response_data = Task_Details::create($task_details);
+                $response_data = Invoice::create($Invoice);
+                foreach ($request->item_list as $i=> $item){
+                    $invoice_details = array(
+                        'particular'            =>  $item['particular'],
+                        'invoiceId'             =>  $response_data->id,
+                        'qty'                   =>  $item['qty'],
+                        'rate'                  =>  $item['rate'],
+                        'amount'                =>  $item['amount'],
+                        'created_by'            =>  Session::get('User_details')['id'],
+                        'created_at'            =>  date('Y-m-d h:i:s')
+                    );
+                    $response_data = InvoiceDetails::create($invoice_details);
+                }
             }
             else{
                 //updating with Id
-                $response_data = Task_Details::where('id',$request->input('id'))->update($task_details);
+                $response_data = Invoice::where('id',$request->input('id'))->update($Invoice);
+                $response_data = InvoiceDetails::where('invoiceId',$request->input('id'))->delete();
+                foreach ($request->item_list as $i=> $item){
+                    $invoice_details = array(
+                        'particular'            =>  $item['particular'],
+                        'invoiceId'             =>  $request->input('id'),
+                        'qty'                   =>  $item['qty'],
+                        'rate'                  =>  $item['rate'],
+                        'amount'                =>  $item['amount'],
+                        'created_by'            =>  Session::get('User_details')['id'],
+                        'created_at'            =>  date('Y-m-d h:i:s')
+                    );
+                    $response_data = InvoiceDetails::create($invoice_details);
+                }
             }
         return $response_data;
     }
     //Listing all task list
-    public function tasklist(){
-        $TaskDetails = Task_Details::where('UserId',Session::get('User_details')['id'])->get();
+    public function InvoiceList(){
+        $TaskDetails = Invoice::where('UserId',Session::get('User_details')['id'])->get();
         return $TaskDetails;
     }
 
     //pulling assigned task lists
 
-    public function Assigntasklist(){
-        $TaskDetails = Task_details_history::where('UserId',Session::get('User_details')['id'])->get();
+    public function InvoiceDetails($id){
+        $TaskDetails = InvoiceDetails::where('invoiceId',$id)->get();
         return $TaskDetails;
     }
     //Fetching user details and task details by email and userId
@@ -214,7 +273,7 @@ class HomeController extends Controller
         $userDetails = UsersModel::where('email', $paramdata[0])->first();
             if($userDetails){
                 //returning array inside array
-                $userDetails->TaskDetails = DB::table('task_details as td')
+                $userDetails->TaskDetails = DB::table('Invoice as td')
                 ->select('td.*')
                 ->where('userId', $userDetails->id)
                 ->get();
@@ -226,7 +285,7 @@ class HomeController extends Controller
     public function DeleteUser($id){
         $user_id = $id;
         //checking for pending or under process task in system
-        $checktask = Task_Details::where('userId',$user_id)->whereIn('taskStatus',['Pending','Under Process'])->first();
+        $checktask = Invoice::where('userId',$user_id)->whereIn('taskStatus',['Pending','Under Process'])->first();
         if($checktask!='' && $checktask!=null){
             return 'taskExist';
         }
@@ -266,7 +325,7 @@ class HomeController extends Controller
         ->get();
         // $allusers = UsersModel::where('status', '1')->get();
         foreach ($allusers as $user) {
-            $taskcounts = DB::table('task_details')
+            $taskcounts = DB::table('Invoice')
                 ->select(
                     DB::raw('COUNT(CASE WHEN taskStatus = "Pending" THEN 1 END) as pending'),
                     DB::raw('COUNT(CASE WHEN taskStatus = "Completed" THEN 1 END) as completed'),
@@ -293,7 +352,7 @@ class HomeController extends Controller
     public function Assign_task($parameters){
         //Pulling username of user who have assign you task
         $paramdata = explode('__', $parameters);
-        $PullingUserId = Task_Details::where('id',$paramdata[0])->first();
+        $PullingUserId = Invoice::where('id',$paramdata[0])->first();
         if($PullingUserId){
             $username = UsersModel::select('name','email')->where('id',$PullingUserId->userId)->first();
         }
@@ -301,11 +360,11 @@ class HomeController extends Controller
             'userId'     => $paramdata[1],
             'ownership'  => 'Assigned by ' . $username->email,
         ];
-        $TaskDetails = Task_Details::where('id',$paramdata[0])->update($newuser);
+        $TaskDetails = Invoice::where('id',$paramdata[0])->update($newuser);
 
         //deleting for previous data
         if($paramdata[3]=='Re_assign'){
-            $TaskDetails = Task_details_history::where('id',$paramdata[4])->delete();
+            $TaskDetails = Invoice_history::where('id',$paramdata[4])->delete();
                 $content = "Dear " . $paramdata[5] . '<br> You have got new task assigned by ( ' .$username->email .'), Please login into the system and  check the deatils : ' 
                 . '<br>';
         }
@@ -325,7 +384,7 @@ class HomeController extends Controller
             'userId'                => Session::get('User_details')['id'],
             'ownership'             => 'Assigned to ' . $paramdata[2],
         ];
-        $TaskDetails = Task_details_history::create($task_history);
+        $TaskDetails = Invoice_history::create($task_history);
 
         //Sending email notification
         if($TaskDetails){
@@ -355,15 +414,15 @@ class HomeController extends Controller
         }
         $TaskDetails=[];
         if($paramdata[0]!='' && $paramdata[1]==''){
-            $TaskDetails = Task_Details::where('UserId',Session::get('User_details')['id'])
+            $TaskDetails = Invoice::where('UserId',Session::get('User_details')['id'])
             ->where('taskStatus',$paramdata[0])->get();
         }
         else if($paramdata[0]=='' && $paramdata[1]!='' ){
-            $TaskDetails = Task_Details::where('UserId',Session::get('User_details')['id'])
+            $TaskDetails = Invoice::where('UserId',Session::get('User_details')['id'])
             ->where('priority',$paramdata[1])->get();
         }
         else if($paramdata[0]!='' && $paramdata[1]!='' ){
-            $TaskDetails = Task_Details::where('UserId',Session::get('User_details')['id'])
+            $TaskDetails = Invoice::where('UserId',Session::get('User_details')['id'])
             ->where('priority',$paramdata[1])->where('taskStatus',$paramdata[0])->get();
         }
         return $TaskDetails;
@@ -371,16 +430,16 @@ class HomeController extends Controller
     }
     //Deleting the task re-assigning
     public function taskDeleteReAssigned($id){
-        $deletingReAssignTask = Task_details_history::where('parent_id',$id)->delete();
+        $deletingReAssignTask = Invoice_history::where('parent_id',$id)->delete();
         if($deletingReAssignTask){
-            $deletingTask = Task_Details::where('id',$id)->delete();
+            $deletingTask = Invoice::where('id',$id)->delete();
         }
         return $deletingReAssignTask;
 
     }
     //Deleting Task
     public function taskDelete($id=""){
-        $deletingTask = Task_Details::where('id',$id)->delete();
+        $deletingTask = Invoice::where('id',$id)->delete();
         return $deletingTask;
     }
     //Function to update profile details
@@ -424,7 +483,7 @@ class HomeController extends Controller
     public function getPersonalDetails($id){
         $user_details = UsersModel::where('id',Session::get('User_details')['id'])->first();
         if($user_details){  
-            $user_details->taskDetails = Task_Details::where('userId',$id)->get();
+            $user_details->taskDetails = Invoice::where('userId',$id)->get();
         };
         return $user_details;
 
@@ -465,9 +524,9 @@ class HomeController extends Controller
     }
     public function taskDetails(){
         if(Session::get('User_details')['system_role'] == 'User'){
-            $taskSummary = Task_Details::where('userId',Session::get('User_details')['id'])->first();
+            $taskSummary = Invoice::where('userId',Session::get('User_details')['id'])->first();
             if($taskSummary){
-                $counts = DB::table('task_details')
+                $counts = DB::table('Invoice')
                     ->select(
                         DB::raw('COUNT(CASE WHEN taskStatus = "Pending" THEN 1 END) as pending'),
                         DB::raw('COUNT(CASE WHEN taskStatus = "Completed" THEN 1 END) as completed'),
@@ -479,7 +538,7 @@ class HomeController extends Controller
             }
         }
         else{
-            $counts = DB::table('task_details')
+            $counts = DB::table('Invoice')
                     ->select(
                         DB::raw('COUNT(CASE WHEN taskStatus = "Pending" THEN 1 END) as pending'),
                         DB::raw('COUNT(CASE WHEN taskStatus = "Completed" THEN 1 END) as completed'),
@@ -576,7 +635,7 @@ class HomeController extends Controller
 
 //pulling notification
     public function getNotification(){
-        $counts = DB::table('task_details')
+        $counts = DB::table('Invoice')
         ->select(
             DB::raw('COUNT(*) as notificationCount'),
         )
