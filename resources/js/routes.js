@@ -4,6 +4,7 @@ export default [
     { path: '/dashboard', name:'dashboard', component: require('./components/Dashboard.vue').default },
     { path: '/userprofile', component: require('./components/Profile/Userprofile.vue').default },
     { path: '/passReset', component: require('./components/profile/password_reset.vue').default },
+    { path: '/PrintDetails',name:'PrintDetails', component: require('./components/invoice_creation/PrintDetails.vue').default },
 
 
     //Creating and listing own task
@@ -11,10 +12,19 @@ export default [
     children:[
             { path: '/',name:'invoice_index', component: require('./components/invoice_creation/list_invoice.vue').default },
             { path: '/list_invoice',name:'list_invoice', component: require('./components/invoice_creation/list_invoice.vue').default },
-            // { path: '/assigned_list_invoice',name:'assigned_list_invoice', component: require('./components/invoice_creation/assigned_list_invoice.vue').default },
             { path: '/create_invoice',name:'create_invoice', component: require('./components/invoice_creation/create_invoice.vue').default },
             { path: '/view_invoice',name:'view_invoice', component: require('./components/invoice_creation/view_invoice.vue').default },
             { path: '/edit_invoice',name:'edit_invoice', component: require('./components/invoice_creation/edit_invoice.vue').default },
+        ]
+    },
+
+    //Updating Bill
+    { path: '/bill_index',  component: require('./components/bill_update/bill_index.vue').default ,
+    children:[
+            { path: '/',name:'bill_index', component: require('./components/bill_update/list_bill.vue').default },
+            { path: '/list_bill',name:'list_bill', component: require('./components/bill_update/list_bill.vue').default },
+            { path: '/view_bill',name:'view_bill', component: require('./components/bill_update/view_bill.vue').default },
+            { path: '/edit_bill',name:'edit_bill', component: require('./components/bill_update/edit_bill.vue').default },
         ]
     },
     //Creating user by admin

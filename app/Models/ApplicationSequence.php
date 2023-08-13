@@ -12,6 +12,6 @@ class ApplicationSequence extends Model
     public $timestamps = false;
     protected $table="application_sequence";
     protected $fillable = [
-        'id','service_name','last_sequence'
+        'id','service_name','last_sequence','year'
     ];
 }

@@ -3,7 +3,7 @@
         <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
             <div class="card card-primary card-outline">
                 <div class="form-group card-header bg-white pt-2 pb-1 text-right index">
-                    <label class="fa-pull-left">New Edge Billing Invoice</label>
+                    <label class="fa-pull-left">New Edge Invoice</label>
                     <button type="button" class="btn btn-flat bg-blue btn-sm" @click="loadpage('create_invoice')"><i class="fa fa-plus"></i> Create Invoice</button>
                     <button type="button" class="btn btn-flat bg-success btn-sm"  @click="loadpage('list_invoice')"><i class="fa fa-list"></i> List</button>
                     <!-- <button type="button" class="btn btn-flat bg-secondary btn-sm"  @click="loadpage('assigned_list_task')"><i class="fa fa-list"></i> Assigned List</button> -->

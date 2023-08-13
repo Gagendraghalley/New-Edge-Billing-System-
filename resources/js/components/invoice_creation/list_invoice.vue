@@ -26,7 +26,7 @@
                 <i class="fas fa-download" ></i> Fetch</button>
             </div>
         </div> -->
-        <table id="InvoiceList" cellspacing="0" width="100%" class="stripe cell-border order-column" >
+        <table id="InvoiceList" cellspacing="0" width="100%" class="stripe cell-border order-column" border="1" style="border-color: rgb(235, 229, 229);border-collapse: collapse;" >
             <thead>
                 <tr>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Sl.No.</th>
@@ -46,12 +46,12 @@
                     <td>{{ task.entry_date}} </td>
                     <td>{{ task.workorderNo}} </td>
                     <td>{{ task.addressTo}} </td>
-                    <td>{{ task.totalAmount }} / </td>
+                    <td>Nu. {{ task.totalAmount }} </td>
                     <td>{{ task.due_date}} </td>
                     <td style='font-weight: bold;font-family: "Times New Roman", Times, serif'>
                         <a href="#" class="btn btn-info btn-sm btn-flat text-white" @click="loadeditpage(task)"><i class="fa fa-edit"></i> Edit</a>
-                        <a v-if="task.ownership=='Own Task'" href="#" class="btn btn-danger btn-sm btn-flat text-white" @click="Delete(task.id)" :disabled="isLoading"><i class="fa fa-trash"></i> Delete</a>
-                        <a href="#" class="btn btn-info btn-sm btn-flat text-white" @click="Viewpage(task)"><i class="fa fa-edit"></i> View</a>
+                        <a href="#" class="btn btn-danger btn-sm btn-flat text-white" @click="Delete(task.id)"><i class="fa fa-trash"></i> Delete</a>
+                        <a href="#" class="btn btn-info btn-sm btn-flat text-white" @click="Prinpage(task)"><i class="fa fa-print"></i> Print</a>
                         <div v-if="isLoading" class="overlay">
                             <i class="fas fa-spinner fa-spin"></i>
                         </div>
@@ -84,10 +84,12 @@ export default {
         Viewpage(data){ 
             this.$router.push({name:"view_invoice",params:{data:data}});
         },
+        Prinpage(data){ 
+            this.$router.push({name:"PrintDetails",params:{data:data}});
+        },
 
         //Loading all task list by userId
         InvoiceListDetails(){
-            this.isLoading = true;
             this.InvoiceList =[];
             let uri="";
                 uri='InvoiceList';
@@ -99,15 +101,12 @@ export default {
                 .catch((err) => {
                 console.log("Error:"+err)
             })
-            .finally(() => {
-                this.isLoading = false;
-            });
+            ;
             
         },
 
         //filtering by parameter
         Filier(){
-            this.isLoading = true;
             this.InvoiceList =[];
             this.form.taskStatus='';
             this.form.priority='';
@@ -121,13 +120,12 @@ export default {
                     let data = response.data;
                     this.InvoiceList = data;
                 });
-            this.isLoading = false;
         },
         //deleting the task
         Delete(id){
             Swal.fire({
                 title: 'Delete Confirmation',
-                text: 'Are your sure you want to delete this task?',
+                text: 'Are your sure you want to delete this Invoice?',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -142,23 +140,19 @@ export default {
                 cancelButton: 'Delete-cancel-button'
                 }
             }).then((result) => {
-                this.isLoading = true;
                 if(result.isConfirmed){
-                    axios.get('taskDelete/'+id)
+                    axios.get('InvoiceDelete/'+id)
                     .then((response) => {
                         Toast.fire({
                         icon: 'success',
-                        title: 'Task Deleted Successfully'
+                        title: 'Invoice Deleted Successfully'
                         })
-                        this.$router.push('/list_task')
+                        this.$router.push('/list_invoice')
                         this.InvoiceListDetails();
                     })
                     .catch((error) => {
                         console.log("Error remove:"+error);
                     })
-                    .finally(() => {
-                        this.isLoading = false;
-                    });
                 }
             });
         },

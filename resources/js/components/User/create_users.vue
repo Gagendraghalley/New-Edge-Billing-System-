@@ -53,6 +53,8 @@
                                     <option value=""> --Select--</option>
                                     <option value="Admin">Admin</option>
                                     <option value="User">User</option>
+                                    <option value="View">Report Viewer</option>
+                                    
                                 </select>
                                 <has-error :form="form" field="role"></has-error>
                             </div>

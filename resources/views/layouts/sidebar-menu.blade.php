@@ -59,6 +59,33 @@
                         </router-link>
                     </li>
                     <li class="nav-item">
+                        <router-link to="/bill_index" class="nav-link">
+                            <i class="fa fa-users nav-icon text-white"></i>
+                            <p class="text-white"><b>Bill Update</b></p>
+                        </router-link>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <router-link to="/chage_password" class="nav-link">
+                            <i class="fa fa-lock nav-icon text-white"></i>
+                            <p class="text-white"><b>Change Your Password</b></p>
+                        </router-link>
+                    </li>
+                @endif
+                @if(session('User_details')['system_role']!=null && session('User_details')['system_role']=='View')
+                    <li class="nav-item">
+                        <router-link to="/userprofile" class="nav-link">
+                            <i class="fa fa-user nav-icon text-white"></i>
+                            <p class="text-white"><b>Profile</b></p>
+                        </router-link>  
+                    </li>
+                    <li class="nav-item">
+                        <router-link to="/view_invoice" class="nav-link">
+                            <i class="fa fa-users nav-icon text-white"></i>
+                            <p class="text-white"><b>View Billing Invoice</b></p>
+                        </router-link>
+                    </li>
+                    <li class="nav-item">
                         <router-link to="/chage_password" class="nav-link">
                             <i class="fa fa-lock nav-icon text-white"></i>
                             <p class="text-white"><b>Change Your Password</b></p>

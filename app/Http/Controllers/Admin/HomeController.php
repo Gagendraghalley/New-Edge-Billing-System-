@@ -169,36 +169,40 @@ class HomeController extends Controller
             ];
             $this->validate($request, $rules, $customMessages);
             //generating application number
-            $last_seq=ApplicationSequence::where('service_name','invoice')->first();
-                if($last_seq==null || $last_seq==""){
-                    $last_seq=1;
-                    $app_details = [
-                        'service_name'                  =>  'invoice',
-                        'last_sequence'                 =>  $last_seq,
-                    ];
-                    ApplicationSequence::create($app_details);
-                }
-                else{
-                    $last_seq=$last_seq->last_sequence+1;
-                    $app_details = [
-                        'last_sequence'                 =>  $last_seq,
-                    ];
-                    ApplicationSequence::where('service_name', 'invoice')->update($app_details);
-                }
+            if($request->input('action')=='add'){
+                    $last_seq=ApplicationSequence::where('service_name','invoice')->where('year', date('Y'))->first();
+                    if($last_seq==null || $last_seq==""){
+                        $last_seq=1;
+                        $app_details = [
+                            'service_name'                  =>  'invoice',
+                            'last_sequence'                 =>  $last_seq,
+                            'year'                          =>  date('Y'),
+                        ];
+                        ApplicationSequence::create($app_details);
+                    }
+                    else{
+                        $last_seq=$last_seq->last_sequence+1;
+                        $app_details = [
+                            'last_sequence'                 =>  $last_seq,
+                        ];
+                        ApplicationSequence::where('service_name', 'invoice')->update($app_details);
+                    }
 
-                $application_no='NET/Invoice/';
-                if(strlen($last_seq)==1){
-                    $application_no= $application_no.date('Y').'/'.date('m').'/000'.$last_seq;
+                    $application_no='NET/Invoice/';
+                    if(strlen($last_seq)==1){
+                        $application_no= $application_no.date('Y').'/000'.$last_seq;
+                    }
+                    else if(strlen($last_seq)==2){
+                        $application_no= $application_no.date('Y').'/00'.$last_seq;
+                    }
+                    else if(strlen($last_seq)==3){
+                        $application_no= $application_no.date('Y').'/0'.$last_seq;
+                    }
+                    else if(strlen($last_seq)==4){
+                        $application_no= $application_no.date('Y').'/'.$last_seq;
+                    }
                 }
-                else if(strlen($last_seq)==2){
-                    $application_no= $application_no.date('Y').'/'.date('m').'/00'.$last_seq;
-                }
-                else if(strlen($last_seq)==3){
-                    $application_no= $application_no.date('Y').'/'.date('m').'/0'.$last_seq;
-                }
-                else if(strlen($last_seq)==4){
-                    $application_no= $application_no.date('Y').'/'.date('m').'/'.$last_seq;
-                }
+            
 
             //data preperation for creating tasks
                 $Invoice = [
@@ -211,12 +215,15 @@ class HomeController extends Controller
                     'totalAmountInWords'    => $request->input('totalAmountInWords'),
                     'Tpn_no'                => 'NAC00078',
                     'academic_year'         => date('Y'),
-                    'Bill_no'               => $application_no,
+                    // 'Bill_no'               => $application_no,
                     'userId'                => Session::get('User_details')['id'],
                     'created_by'            => Session::get('User_details')['id'],
                     'created_at'            =>  date('Y-m-d h:i:s')
                 ];
             if($request->input('action')=='add'){
+                $Invoice = $Invoice + [
+                    'Bill_no'               => $application_no,
+                ];
                 $response_data = Invoice::create($Invoice);
                 foreach ($request->item_list as $i=> $item){
                     $invoice_details = array(
@@ -228,10 +235,14 @@ class HomeController extends Controller
                         'created_by'            =>  Session::get('User_details')['id'],
                         'created_at'            =>  date('Y-m-d h:i:s')
                     );
-                    $response_data = InvoiceDetails::create($invoice_details);
+                    InvoiceDetails::create($invoice_details);
                 }
             }
+
             else{
+                $Invoice = $Invoice + [
+                    'Bill_no'               => $request->input('Bill_no'),
+                ];
                 //updating with Id
                 $response_data = Invoice::where('id',$request->input('id'))->update($Invoice);
                 $response_data = InvoiceDetails::where('invoiceId',$request->input('id'))->delete();
@@ -245,15 +256,29 @@ class HomeController extends Controller
                         'created_by'            =>  Session::get('User_details')['id'],
                         'created_at'            =>  date('Y-m-d h:i:s')
                     );
-                    $response_data = InvoiceDetails::create($invoice_details);
+                    InvoiceDetails::create($invoice_details);
                 }
             }
         return $response_data;
     }
     //Listing all task list
     public function InvoiceList(){
-        $TaskDetails = Invoice::where('UserId',Session::get('User_details')['id'])->get();
+        $TaskDetails = Invoice::where('UserId',Session::get('User_details')['id'])->where('status', 'Pending')->get();
         return $TaskDetails;
+    }
+
+    public function BillList(){
+        $userId = Session::get('User_details')['id'];
+        $year = date('Y'); // Get the current year
+        $month = date('m'); // Get the current month
+        
+        $BillList = Invoice::where('UserId', $userId)
+            ->whereRaw('YEAR(entry_date) = ? AND MONTH(entry_date) = ?', [$year, $month])
+            ->orderBy('entry_date', 'desc')
+            ->get();
+    
+        
+        return $BillList;
     }
 
     //pulling assigned task lists
@@ -363,15 +388,15 @@ class HomeController extends Controller
         $TaskDetails = Invoice::where('id',$paramdata[0])->update($newuser);
 
         //deleting for previous data
-        if($paramdata[3]=='Re_assign'){
-            $TaskDetails = Invoice_history::where('id',$paramdata[4])->delete();
-                $content = "Dear " . $paramdata[5] . '<br> You have got new task assigned by ( ' .$username->email .'), Please login into the system and  check the deatils : ' 
-                . '<br>';
-        }
-        else{
-            $content = "Dear " . $paramdata[4] . '<br> You have got new task assigned by ( ' .$username->email .'), Please login into the system and  check the deatils : ' 
-            . '<br>';
-        }
+        // if($paramdata[3]=='Re_assign'){
+        //     $TaskDetails = Invoice_history::where('id',$paramdata[4])->delete();
+        //         $content = "Dear " . $paramdata[5] . '<br> You have got new task assigned by ( ' .$username->email .'), Please login into the system and  check the deatils : ' 
+        //         . '<br>';
+        // }
+        // else{
+        //     $content = "Dear " . $paramdata[4] . '<br> You have got new task assigned by ( ' .$username->email .'), Please login into the system and  check the deatils : ' 
+        //     . '<br>';
+        // }
         //Keeping history
         $task_history = [
             'parent_id'             => $PullingUserId->id,
@@ -384,63 +409,113 @@ class HomeController extends Controller
             'userId'                => Session::get('User_details')['id'],
             'ownership'             => 'Assigned to ' . $paramdata[2],
         ];
-        $TaskDetails = Invoice_history::create($task_history);
+        // $TaskDetails = Invoice_history::create($task_history);
 
         //Sending email notification
-        if($TaskDetails){
-            $task_notification = [
-                'email'                 =>  $paramdata[2],
-                'subject'               =>  'Task Assigned',
-                'content'               =>  $content,
-                'bodyMessage'           =>  $content,
-            ];
-            $mail = Mail::send('emails.mail', $task_notification, function ($message) use ($task_notification) {
-                $message->from('taskinfo41@gmail.com');
-                $message->to($task_notification['email']);
-                $message->subject($task_notification['subject']);
-            });
-            if (Mail::failures())
-                return json_encode('email failed');
-        }
-        return $TaskDetails;
+        // if($TaskDetails){
+        //     $task_notification = [
+        //         'email'                 =>  $paramdata[2],
+        //         'subject'               =>  'Task Assigned',
+        //         'content'               =>  $content,
+        //         'bodyMessage'           =>  $content,
+        //     ];
+        //     $mail = Mail::send('emails.mail', $task_notification, function ($message) use ($task_notification) {
+        //         $message->from('taskinfo41@gmail.com');
+        //         $message->to($task_notification['email']);
+        //         $message->subject($task_notification['subject']);
+        //     });
+        //     if (Mail::failures())
+        //         return json_encode('email failed');
+        // }
+        // return $TaskDetails;
     }
 
     //listing task by params
-    public function tasklistByParams($params){
+    public function BillListByParams($params){
         //spliting the parameters using explode
         $paramdata = explode('__', $params);
-        if($paramdata[0]=='Under_Process'){
-            $paramdata[0] = 'Under Process';
+        if($paramdata[0]=='Not_Received'){
+            $paramdata[0] = 'Pending';
         }
-        $TaskDetails=[];
-        if($paramdata[0]!='' && $paramdata[1]==''){
-            $TaskDetails = Invoice::where('UserId',Session::get('User_details')['id'])
-            ->where('taskStatus',$paramdata[0])->get();
+        $billList=[];
+        $userId = session('User_details')['id'];
+        $fromDate = $paramdata[1];
+        $toDate = $paramdata[2];
+        if($paramdata[0]!='All'){
+            $billList = Invoice::where('UserId', $userId)
+                ->where('status', $paramdata[0])
+                ->where('entry_date', '>=', $fromDate)
+                ->where('entry_date', '<=', $toDate)
+                ->get();
         }
-        else if($paramdata[0]=='' && $paramdata[1]!='' ){
-            $TaskDetails = Invoice::where('UserId',Session::get('User_details')['id'])
-            ->where('priority',$paramdata[1])->get();
+        else{
+            $billList = Invoice::where('UserId', $userId)
+            ->where('entry_date', '>=', $fromDate)
+            ->where('entry_date', '<=', $toDate)
+            ->get();
         }
-        else if($paramdata[0]!='' && $paramdata[1]!='' ){
-            $TaskDetails = Invoice::where('UserId',Session::get('User_details')['id'])
-            ->where('priority',$paramdata[1])->where('taskStatus',$paramdata[0])->get();
-        }
-        return $TaskDetails;
+        return $billList;
         
     }
     //Deleting the task re-assigning
-    public function taskDeleteReAssigned($id){
-        $deletingReAssignTask = Invoice_history::where('parent_id',$id)->delete();
-        if($deletingReAssignTask){
-            $deletingTask = Invoice::where('id',$id)->delete();
-        }
-        return $deletingReAssignTask;
+    // public function taskDeleteReAssigned($id){
+    //     $deletingReAssignTask = Invoice_history::where('parent_id',$id)->delete();
+    //     if($deletingReAssignTask){
+    //         $deletingTask = Invoice::where('id',$id)->delete();
+    //     }
+    //     return $deletingReAssignTask;
 
+    // }
+    //deleting bill
+
+    public function InvoiceDelete($id){
+        $Delete = Invoice::where('id',$id)->delete();
+            InvoiceDetails::where('invoiceId',$id)->delete();
+        return $Delete;
     }
-    //Deleting Task
-    public function taskDelete($id=""){
-        $deletingTask = Invoice::where('id',$id)->delete();
-        return $deletingTask;
+
+    //Updating bill
+    public function Received($id=""){
+        $data = [
+            'status'        => 'Received',
+            'received_date' => date('y-m-d'),
+        ];
+        $UpdateBill = Invoice::where('id',$id)->update($data);
+        return $UpdateBill;
+    }
+    public function uploadBillDoc(Request $request){
+        //getting application number 
+        $data = Invoice::where('id',$request->id)->first();
+        $bill_number = $data->Bill_no;
+        $file = $request->file('file');
+        $path = "";
+        $file_store_path = 'billfile';
+
+        if ($file !== null && $file->isValid()) {
+            // Delete existing file if it exists
+                $existingFilePath = "public/" . $request->profile_path;
+                if (Storage::exists($existingFilePath)) {
+                    Storage::delete($existingFilePath);
+                }
+
+                // Generate a unique file name
+                $file_name = time() . '_' . $file->getClientOriginalName();
+
+                // Store the new file and get its path
+                $file_path = $file->storeAs($file_store_path, $file_name, 'public');
+                $path = $file_store_path . '/' . $bill_number;
+
+                // Update the file path in the database
+                $update_file = [
+                    'bill_file' => $path,
+                ];
+                // Assuming 'Invoice' is the model for the database table
+                $UploadFile = Invoice::where('id', $request->id)->update($update_file);
+
+                return $UploadFile; // This line should probably be removed or modified
+            }
+            // If no new file was uploaded or it's not valid
+            return "No valid file uploaded."; // You might want to return an appropriate response here
     }
     //Function to update profile details
     public function UpdatePerDetails(Request $request){

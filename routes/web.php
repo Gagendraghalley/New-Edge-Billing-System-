@@ -42,11 +42,15 @@ Route::get('/orgListDetails', [App\Http\Controllers\Admin\HomeController::class,
 Route::post('/create_invoice', [App\Http\Controllers\Admin\HomeController::class, 'create_invoice'])->name('create_invoice');
 
 Route::get('/InvoiceList', [App\Http\Controllers\Admin\HomeController::class, 'InvoiceList'])->name('InvoiceList');
+Route::get('/BillList', [App\Http\Controllers\Admin\HomeController::class, 'BillList'])->name('BillList');
 Route::get('/InvoiceDetails/{id}', [App\Http\Controllers\Admin\HomeController::class, 'InvoiceDetails'])->name('InvoiceDetails');
-Route::get('/tasklistByParams/{params}', [App\Http\Controllers\Admin\HomeController::class, 'tasklistByParams'])->name('tasklistByParams');
+Route::get('/InvoiceDelete/{id}', [App\Http\Controllers\Admin\HomeController::class, 'InvoiceDelete'])->name('InvoiceDelete');
+Route::get('/BillListByParams/{params}', [App\Http\Controllers\Admin\HomeController::class, 'BillListByParams'])->name('BillListByParams');
 Route::post('/Assign_task/{parameters}', [App\Http\Controllers\Admin\HomeController::class, 'Assign_task'])->name('Assign_task');
 Route::get('/SearchUserByEmail/{params}', [App\Http\Controllers\Admin\HomeController::class, 'SearchUserByEmail'])->name('SearchUserByEmail');
-Route::get('/taskDelete/{id}', [App\Http\Controllers\Admin\HomeController::class, 'taskDelete'])->name('taskDelete');
+Route::get('/Received/{id}', [App\Http\Controllers\Admin\HomeController::class, 'Received'])->name('Received');
+Route::post('/uploadBillDoc', [App\Http\Controllers\Admin\HomeController::class, 'uploadBillDoc'])->name('uploadBillDoc');
+
 Route::get('/taskDeleteReAssigned/{id}', [App\Http\Controllers\Admin\HomeController::class, 'taskDeleteReAssigned'])->name('taskDeleteReAssigned');
 Route::get('/resetportalpassword/{dob}/{email}', [App\Http\Controllers\Admin\HomeController::class, 'resetportalpassword'])->name('resetportalpassword');
 Route::get('/getSessionDetail', [App\Http\Controllers\Admin\HomeController::class, 'getSessionDetail'])->name('getSessionDetail');
