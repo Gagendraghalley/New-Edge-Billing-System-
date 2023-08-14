@@ -485,39 +485,37 @@ class HomeController extends Controller
     }
     public function uploadBillDoc(Request $request){
         //getting application number 
-        $data = Invoice::where('id',$request->id)->first();
-        $bill_number = $data->Bill_no;
-        $file = $request->file('file');
-        $path = "";
-        $file_store_path = 'billfile';
-
-        if ($file !== null && $file->isValid()) {
-            // Delete existing file if it exists
-                $existingFilePath = "public/" . $request->profile_path;
-                if (Storage::exists($existingFilePath)) {
-                    Storage::delete($existingFilePath);
-                }
-
-                // Generate a unique file name
-                $file_name = time() . '_' . $file->getClientOriginalName();
-
-                // Store the new file and get its path
-                $file_path = $file->storeAs($file_store_path, $file_name, 'public');
-                $path = $file_store_path . '/' . $bill_number;
-
-                // Update the file path in the database
-                $update_file = [
-                    'bill_file' => $path,
-                ];
-                // Assuming 'Invoice' is the model for the database table
-                $UploadFile = Invoice::where('id', $request->id)->update($update_file);
-
-                return $UploadFile; // This line should probably be removed or modified
+        $file = $request->file;
+            if ($file != "undefined" && isset($request->existing_attachments) && $request->existing_attachments != null) {
+                $path = $request->existing_attachments;
+                unlink($path); //delete file and replace path from followng code
             }
-            // If no new file was uploaded or it's not valid
-            return "No valid file uploaded."; // You might want to return an appropriate response here
+            $path = '';
+                $file_store_path = config('services.constant.file_stored_base_path') . 'BillFile';
+                if ($file != null && $file != "" && $file != "undefined") {
+                    if (!is_dir($file_store_path)) {
+                        mkdir($file_store_path, 0777, TRUE);
+                    }
+                    $file_name = time() . '_' . $file->getClientOriginalName();
+                    move_uploaded_file($file, $file_store_path . '/' . $file_name);
+                    $path = $file_store_path . '/' . $file_name;
+                    
+                
+        //updating document path by id
+            $update_file = [
+                'bill_file' => $path,
+            ];
+            // Assuming 'Invoice' is the model for the database table
+            $UploadFile = Invoice::where('id', $request->id)->update($update_file);
+        return $UploadFile;
+        }
     }
     //Function to update profile details
+
+    public function viewFiles($path){
+        $full_path = str_replace('SSS', '/', $path);
+        return response()->download($full_path);
+    }
     public function UpdatePerDetails(Request $request){
         if($request->imageNew==true){
             $validatedData = $request->validate([

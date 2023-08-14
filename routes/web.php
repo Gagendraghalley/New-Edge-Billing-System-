@@ -41,6 +41,8 @@ Route::get('/orgListDetails', [App\Http\Controllers\Admin\HomeController::class,
 //creating create_invoice
 Route::post('/create_invoice', [App\Http\Controllers\Admin\HomeController::class, 'create_invoice'])->name('create_invoice');
 
+
+Route::get('/viewFiles/{path}', [App\Http\Controllers\Admin\HomeController::class, 'viewFiles'])->name('viewFiles');
 Route::get('/InvoiceList', [App\Http\Controllers\Admin\HomeController::class, 'InvoiceList'])->name('InvoiceList');
 Route::get('/BillList', [App\Http\Controllers\Admin\HomeController::class, 'BillList'])->name('BillList');
 Route::get('/InvoiceDetails/{id}', [App\Http\Controllers\Admin\HomeController::class, 'InvoiceDetails'])->name('InvoiceDetails');

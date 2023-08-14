@@ -67,8 +67,8 @@
                     </td>
                     <td style="font-weight: bold; font-family: 'Times New Roman', Times, serif">
                         <a v-if="task.status === 'Pending'" href="#" class="btn btn-info btn-sm btn-flat text-white" @click="Recieved(task.id)"><i class="fa fa-edit"></i> Received</a>
-                        <a v-else :href="'storage/' + task.bill_file" download>
-                            <i class="fa fa-download"> </i> {{ task.bill_file }}
+                        <a v-else href="#" @click="openFile(task.bill_file)" download>
+                            <i :class="getFileIconClass(task.bill_file)"> </i> {{ task.Bill_no }}
                         </a>
                     </td>
                 </tr>
@@ -79,8 +79,13 @@
 <script>
 import Errors from '../../Errors.js';
 export default {
-
     components: {
+        props: {
+            task: {
+            type: Object,
+            required: true,
+            },
+        },
     },
     data() {
         return {
@@ -96,6 +101,37 @@ export default {
         }
     },
     methods: {
+        //downloading the
+        openFile(filename){
+            let file_path=filename;
+            file_path=file_path.replaceAll('/', 'SSS');
+            let uri = 'viewFiles/'+file_path;
+            window.open(uri,"_black");
+        },
+
+        //identifing file and displaying icon based on file type
+        getFileIconClass(file) {
+            const fileExtension = file.split('.').pop().toLowerCase();
+            switch (fileExtension) {
+                case 'pdf':
+                    return 'fa fa-file-pdf'; // Assuming you have a PDF icon class
+                case 'xlsx':
+                case 'xls':
+                    return 'fa fa-file-excel'; // Assuming you have an Excel icon class
+                case 'docx':
+                case 'doc':
+                    return 'fa fa-file-word'; // Assuming you have a Word icon class
+                    case 'png':
+                case 'jpg':
+                case 'jpeg':
+                case 'gif':
+                case 'svg':
+                return 'fa fa-file-image'; // Assuming you have an Image icon class
+                default:
+                return 'fa fa-file'; // Default icon class for unknown file types
+            }
+        },                                                                                                      
+
         calculateDateDifference(entryDate, dueDate) {
             const entryDateObj = new Date(entryDate);
             const dueDateObj = new Date(dueDate);
@@ -304,6 +340,23 @@ export default {
 }
 </script>
 <style scoped>
+   .fa {
+  /* Your icon styling goes here */
+        font-size: 20px; /* Set the desired font size */
+        color: #3498db; /* Set the desired color for the icons */
+    }
+    .fa-file-pdf::before {
+    content: '\f1c1'; /* Unicode for PDF icon in Font Awesome */
+    }
+    .fa-file-excel::before {
+    content: '\f1c3'; /* Unicode for Excel icon in Font Awesome */
+    }
+    .fa-file-word::before {
+    content: '\f1c2'; /* Unicode for Word icon in Font Awesome */
+    }
+    .fa-file::before {
+    content: '\f15b'; /* Default file icon in Font Awesome */
+    }
         th, td { white-space: nowrap; }
         div.dataTables_wrapper {
             width: 900px;
