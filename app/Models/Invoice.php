@@ -17,6 +17,7 @@ class Invoice extends Model
             'entry_date',
             'due_date',
             'received_date',
+            'reference_number',
             'addressTo',
             'workorderNo',
             'totalAmount',
@@ -27,6 +28,7 @@ class Invoice extends Model
             'bill_file',
             'academic_year',
             'userId',
+            'reference_byId',
             'created_at',
             'created_by',
 ];

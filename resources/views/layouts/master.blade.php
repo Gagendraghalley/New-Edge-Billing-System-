@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>{{ config('app.nam', 'NET Billing System') }}</title>
+  <title>{{ config('app.nam', 'NET ERP System') }}</title>
   <link rel="stylesheet" href="{{ mix('/css/app.css') }}">
-  <link rel="shortcut icon"  href="{{ asset('images/profile.png') }}">
+  <link rel="shortcut icon"  href="{{ asset('images/netlogo.png') }}">
 </head>
 
 <body class="hold-transition sidebar-mini" >
@@ -19,14 +19,14 @@
       </li>
       <li class="nav-item">
         <router-link to="#" class="nav-link">
-          <p><b class="text-white">Logged as </b><b class="text-info">{{session('User_details')['email']}}</b></p>
+          <p><b class="text-white">Logged as </b><b class="text-info">{{session('User_details')['name']}}</b></p>
         </router-link>
       </li>
     </ul>
   <!-- notification  -->
   <ul class="navbar-nav ml-auto">
     <li class="nav-item">
-      <router-link class="notification-link" to="/list_task">
+      <router-link class="notification-link" to="#" id="notificationLink">
           <span class="notification-icon">
             <i class="fa fa-bell" style="color: black;"></i>
           </span>
@@ -34,6 +34,8 @@
             <span id="notificationcount"></span>
           </span>
       </router-link>
+      <!-- Pop-up element -->
+
     </li>
   </ul>
   </nav>
@@ -44,9 +46,15 @@
         @endphp
         <img id="profileImage" src="{{ asset('storage/' . $profilePath) }}" alt="no image" class="brand-image img-circle elevation-3" style="opacity: .8; border-radius: 50%;">
         <!-- <img src="{{ asset('/images/profile.png') }}" alt="Profile" class="brand-image img-circle elevation-3" style="opacity: .8;border-radius: 50%;"> -->
-        <span class="brand-text font-weight-light text-white">{{ config('app.nam', ' NET Billing System') }}</span>
+        <span class="brand-text font-weight-light text-white">{{ config('app.nam', ' NET ERP System') }}</span>
       </router-link>
       <hr>
+      <div class="popup" id="comingSoonPopup">
+        <div class="popup-content">
+            <span class="popup-message">Coming Soon</span>
+            <button class="popup-close-btn" onclick="closePopup()">Close</button>
+        </div>
+    </div>
       <div>
           @include('layouts.sidebar-menu')
       </div>
@@ -59,7 +67,7 @@
       <div class="float-right d-none d-sm-block">
         <b>Version</b> 1.0.0
       </div>
-      <strong>&copy; <span id="currentYear"></span> <a href="#">NET Billing System Web Application</a>. All rights reserved.</strong>
+      <strong>&copy; <span id="currentYear"></span> <a href="#">NET ERP System Web Application</a>. All rights reserved.</strong>
     </footer>
   </div>
   <script src="{{ mix('/js/app.js') }}"></script>
@@ -106,17 +114,87 @@
       }
     });
 }
+// added to show pop up saying comming soon , need to remove once notification is made functional
+function showPopup() {
+    document.getElementById("comingSoonPopup").style.display = "flex";
+}
+
+// Function to close the pop-up
+function closePopup() {
+    document.getElementById("comingSoonPopup").style.display = "none";
+}
+
+// Add click event listener to the notification link
+document.getElementById("notificationLink").addEventListener("click", function(event) {
+    event.preventDefault(); // Prevent the default link behavior
+    showPopup(); // Show the pop-up
+});
+
 // pulling Notification
 function getNotification() {
         axios.get('getNotification')
         .then(response => {
-            let data =response.data.notificationCount;
+            // let data =response.data.notificationCount;
+            let data =0;
             $('#notificationcount').html(data);
             
         });
     }
 </script>
 <style>
+  .popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.popup-content {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.popup-message {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333333;
+    margin-bottom: 15px;
+}
+
+.popup-close-btn {
+    padding: 10px 20px;
+    border: none;
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.popup-close-btn:hover {
+    background-color: #555;
+}
+
+
+.popup-close-btn {
+    margin-top: 10px;
+    padding: 5px 10px;
+    border: none;
+    background-color: #333;
+    color: white;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
   .logout-popup {
     border-radius: 8px;
     background-color: #f5f5f5;

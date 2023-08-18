@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{config('app.nam')}}</title>
-        <link rel="shortcut icon"  href="{{ asset('images/profile.png') }}">
+        <link rel="shortcut icon"  href="{{ asset('images/netlogo.png') }}">
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
 
@@ -79,7 +79,7 @@
                             <span>
                                 <span class="title-icon">N</span>ew
                                 <span class="title-icon">E</span>dge 
-                                <span class="title-icon">B</span>illing
+                                <span class="title-icon">E</span>RP
                                 <span class="title-icon">S</span>ystem
                             </span>
                         </b>

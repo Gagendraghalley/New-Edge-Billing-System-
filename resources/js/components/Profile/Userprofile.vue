@@ -7,8 +7,8 @@
                         <div class="card card-outline">
                             <div class="card-body box-profile">
                                 <div class="text-center">
-                                    <img v-if="isprofile" class="img-fluid img-circle round-image" :src="'storage/' + form.profilePicture" alt="Profile" @error="onErrorLoad" style="max-height: 200px; max-width: 200px;border-radius: 50%;"/>
-                                    <img v-else class="profile-user-img img-fluid img-circle" src="images/user.png" alt="User profile picture" style="max-height: 200px; max-width: 200px;border-radius: 50%;"/>
+                                    <!-- <img v-if="isprofile" class="img-fluid img-circle round-image" :src="'storage/' + this.form.profilePicture" alt="Profile" @error="onErrorLoad" style="max-height: 200px; max-width: 200px;border-radius: 50%;"/> -->
+                                    <!-- <img v-else class="profile-user-img img-fluid img-circle" src="images/user.png" alt="User profile picture" style="max-height: 200px; max-width: 200px;border-radius: 50%;"/> -->
                                 </div>
                             </div>
                             <div class="form-group" style="height: 100px;">
@@ -22,8 +22,8 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 align-items-center">
+        <div class="row center-container">
+            <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 align-items-center">
                 <div class="login-logo bg-primary text-white">
                     <b>Personal Details</b>
                 </div>
@@ -46,13 +46,6 @@
                                 <input type="number" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength = "8" minlength = "8" class="form-control" @change="remove_error('contact_no')" :class="{ 'is-invalid': form.errors.has('contact_no') }" id="contact_no" v-model="form.contact_no" placeholder="Contact No">
                                 <has-error :form="form" field="contact_no"></has-error>
                             </li>
-                            <!-- organization -->
-                            <li class="list-group-item">
-                                <label>Select Company:</label>
-                                <select v-model="form.org_id" :class="{ 'is-invalid select2 select2-hidden-accessible': form.errors.has('org_id') }" class="form-control select2" name="org_id" id="org_id">
-                                    <option v-for="(item, index) in orgList" :key="index" v-bind:value="item.id">{{ item.name}}</option>
-                                </select>
-                            </li>
                             <li class="list-group-item">
                                 <label>Position Held:</label>
                                 <input type="text" class="form-control" @change="removeerror('position','position_err')" v-model="form.position" />
@@ -69,37 +62,6 @@
                             </div>
 
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group table-responsive col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                <div class="login-logo bg-primary text-white">
-                    <b>Task Details</b>
-                </div>
-                <div class="card card-primary card-outline">
-                    <div class="card-body box-profile">
-                        <table id="taskList" cellspacing="0" width="100%" class="table table-bordered table-striped table-head-fixed">
-                            <thead>
-                            <tr>
-                                <th style="font-weight: bold; font-family: 'Times New Roman'">Sl.No.</th>
-                                <th style="font-weight: bold; font-family: 'Times New Roman'">Title</th>
-                                <th style="font-weight: bold; font-family: 'Times New Roman'">Priority Level</th>
-                                <th style="font-weight: bold; font-family: 'Times New Roman'">Task Status</th>
-                            </tr>
-                            </thead>
-                            <tbody v-if="userDetails.taskDetails">
-                            <tr v-for="(task, index) in userDetails.taskDetails" :key="index">
-                                <td>{{ index + 1 }}</td>
-                                <td>{{ task.title }}</td>
-                                <td v-if="task.priority=='High'"><span class="badge badge-danger">{{ task.priority }}</span></td>
-                                <td v-else-if="task.priority=='Medium'"><span class="badge badge-warning">{{ task.priority }}</span></td>
-                                <td v-else><span class="badge badge-info">{{ task.priority }}</span></td>
-                                <td v-if="task.taskStatus=='Completed'"><span class="badge badge-success">{{ task.taskStatus }}</span></td>
-                                <td v-else-if="task.taskStatus=='Under Process'"><span class="badge badge-info">{{ task.taskStatus }}</span></td>
-                                <td v-else><span class="badge badge-warning">{{ task.taskStatus }}</span></td>
-                            </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
@@ -240,6 +202,12 @@ export default {
 };
 </script>
 <style>
+    .center-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /* height: 100vh; */
+    }
     .progress {
     height: 25px;
     }

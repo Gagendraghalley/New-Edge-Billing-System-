@@ -40,13 +40,13 @@
                             </div>
                         </div>
                         <div class="row form-group">
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <!-- <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                 <label>Select Company:<span class="text-danger">*</span></label>
                                 <select v-model="form.org_id" :class="{ 'is-invalid select2 select2-hidden-accessible': form.errors.has('org_id') }" class="form-control select2" name="org_id" id="org_id">
                                     <option value=""> --Select--</option>
                                     <option v-for="(item, index) in orgList" :key="index" v-bind:value="item.id" v-if="item.id=='8070fd6f-fc67-4379-99c3-048e325f7d27'">{{ item.name}}</option>
                                 </select>
-                            </div>
+                            </div> -->
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                 <label>System User:<span class="text-danger">*</span></label>
                                 <select v-model="form.role" :class="{ 'is-invalid select2 select2-hidden-accessible': form.errors.has('role') }" class="form-control select2" name="role" id="role">
@@ -87,7 +87,6 @@ export default {
                 password:'',
                 confirm_password:'',
                 email:'',
-                org_id:'',
                 role:'',
                 action :'add',
             })

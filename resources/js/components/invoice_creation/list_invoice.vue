@@ -1,31 +1,5 @@
 <template>
     <div class="form-group table-responsive col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-4 ">
-        <!-- <div class="row form-group">
-            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                <label>Task Status:</label>
-                    <select v-model="form.taskStatus" :class="{ 'is-invalid select2 select2-hidden-accessible': form.errors.has('taskStatus') }" class="form-control select2" name="taskStatus" id="taskStatus">
-                        <option value=""> --Select--</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Under_Process">Under Process</option>
-                        <option value="Completed">Completed</option>
-                    </select>
-                    <has-error :form="form" field="taskStatus_err"></has-error>
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                <label>Priority Level:</label>
-                    <select v-model="form.priority" :class="{ 'is-invalid select2 select2-hidden-accessible': form.errors.has('priority') }" class="form-control select2" name="priority" id="priority">
-                        <option value=""> --Select--</option>
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
-                    </select>
-                    <has-error :form="form" field="priority"></has-error>
-            </div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 pt-4 mt-2">
-                <button type="button" @click="Filier()" class="btn btn-success">
-                <i class="fas fa-download" ></i> Fetch</button>
-            </div>
-        </div> -->
         <table id="InvoiceList" cellspacing="0" width="100%" class="stripe cell-border order-column" border="1" style="border-color: rgb(235, 229, 229);border-collapse: collapse;" >
             <thead>
                 <tr>
@@ -36,6 +10,7 @@
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Address To</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Total Amount</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Due Date</th>
+                    <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Bill Prepered By</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Action</th>
                 </tr>
             </thead>
@@ -48,9 +23,10 @@
                     <td>{{ task.addressTo}} </td>
                     <td>Nu. {{ task.totalAmount }} </td>
                     <td>{{ task.due_date}} </td>
+                    <td>{{ task.name}} </td>
                     <td style='font-weight: bold;font-family: "Times New Roman", Times, serif'>
-                        <a href="#" class="btn btn-info btn-sm btn-flat text-white" @click="loadeditpage(task)"><i class="fa fa-edit"></i> Edit</a>
-                        <a href="#" class="btn btn-danger btn-sm btn-flat text-white" @click="Delete(task.id)"><i class="fa fa-trash"></i> Delete</a>
+                        <a v-if="system_role!=='View' && system_role!=='User'" href="#" class="btn btn-info btn-sm btn-flat text-white" @click="loadeditpage(task)"><i class="fa fa-edit"></i> Edit</a>
+                        <a  v-if="system_role!=='View' && system_role!=='User'" href="#" class="btn btn-danger btn-sm btn-flat text-white" @click="Delete(task.id)"><i class="fa fa-trash"></i> Delete</a>
                         <a href="#" class="btn btn-info btn-sm btn-flat text-white" @click="Prinpage(task)"><i class="fa fa-print"></i> Print</a>
                         <div v-if="isLoading" class="overlay">
                             <i class="fas fa-spinner fa-spin"></i>
@@ -67,6 +43,7 @@ export default {
     },
     data() {
         return {
+            system_role:'',
             InvoiceList:[],
             dt:'',
             isLoading: false,
@@ -89,20 +66,17 @@ export default {
         },
 
         //Loading all task list by userId
-        InvoiceListDetails(){
-            this.InvoiceList =[];
-            let uri="";
-                uri='InvoiceList';
-                axios.get(uri)
+        InvoiceListDetails() {
+            this.InvoiceList = [];
+            let uri = 'InvoiceList';
+            axios.get(uri)
                 .then(response => {
                     let data = response.data;
-                    this.InvoiceList = data;
+                    this.InvoiceList = data; // Update InvoiceList with the modified data array
                 })
                 .catch((err) => {
-                console.log("Error:"+err)
-            })
-            ;
-            
+                    console.log("Error: " + err);
+                });
         },
 
         //filtering by parameter
@@ -188,7 +162,8 @@ export default {
         axios.get('getSessionDetail')
         .then(response => {
             let data = response.data.data;
-            this.userId=data.id;;
+            this.userId=data.id;
+            this.system_role=data.system_role;
         })
         this.dt = $("#InvoiceList").DataTable({
             "responsive": false,

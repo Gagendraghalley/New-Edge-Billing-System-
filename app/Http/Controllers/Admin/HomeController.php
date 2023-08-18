@@ -13,6 +13,8 @@ use App\Models\UserHistory;
 use App\Models\Organization;
 use App\Models\Invoice;
 use App\Models\InvoiceDetails;
+use App\Models\Purchase;
+use App\Models\PurchaseDetails;
 use App\Models\Invoice_history;
 use App\Models\ApplicationSequence;
 use Exception;
@@ -154,6 +156,119 @@ class HomeController extends Controller
                 return view('userlogin', ['Invalid' => 'You have registered successfully. Please login with email as username and password you have created, both username and password are sent to your registered email']);
             }
     }
+    //method to create purchase order
+    public function create_purposeOrder(Request $request){
+        $rules = [
+            'addressTo'                 =>  'required',
+            'order_date'                =>  'required',
+            'end_user'                  =>  'required',
+            'unit'                      =>  'required',
+            'termAndCondition'          =>  'required',
+        ];
+        $customMessages = [
+            'addressTo.required'        => 'Address to is required',
+            'end_user.required'         => 'End user details  is required',
+            'order_date.required'       => 'Please select purchase order date',
+            'unit.required'             => 'Please select unit',
+            'termAndCondition.required' => 'Please select unit',
+        ];
+        $this->validate($request, $rules, $customMessages);
+        //generating application number
+        if($request->input('action')=='add'){
+                $last_seq=ApplicationSequence::where('service_name','purchase_order')->where('year', date('Y'))->first();
+                if($last_seq==null || $last_seq==""){
+                    $last_seq=1;
+                    $app_details = [
+                        'service_name'                  =>  'purchase_order',
+                        'last_sequence'                 =>  $last_seq,
+                        'year'                          =>  date('Y'),
+                    ];
+                    ApplicationSequence::create($app_details);
+                }
+                else{
+                    $last_seq=$last_seq->last_sequence+1;
+                    $app_details = [
+                        'last_sequence'                 =>  $last_seq,
+                    ];
+                    ApplicationSequence::where('service_name', 'purchase_order')->update($app_details);
+                }
+
+                $application_no='NET/Purchase/';
+                if(strlen($last_seq)==1){
+                    $application_no= $application_no.date('Y').'/000'.$last_seq;
+                }
+                else if(strlen($last_seq)==2){
+                    $application_no= $application_no.date('Y').'/00'.$last_seq;
+                }
+                else if(strlen($last_seq)==3){
+                    $application_no= $application_no.date('Y').'/0'.$last_seq;
+                }
+                else if(strlen($last_seq)==4){
+                    $application_no= $application_no.date('Y').'/'.$last_seq;
+                }
+            }
+        //data preperation for creating tasks
+            $Purchase = [
+                'id'                    => $request->input('id'),
+                'order_date'            => $request->input('order_date'),
+                'end_user'              => $request->input('end_user'),
+                'addressTo'             => $request->input('addressTo'),
+                'termAndCondition'      => $request->input('termAndCondition'),
+                'totalAmount'           => $request->input('totalAmount'),
+                'totalAmountInWords'    => $request->input('totalAmountInWords'),
+                'unit'                  => $request->input('unit'),
+                'status'                => 'Pending',
+                'academic_year'         => date('Y'),
+                'userId'                => Session::get('User_details')['id'],
+                'created_by'            => Session::get('User_details')['id'],
+                'created_at'            =>  date('Y-m-d h:i:s')
+            ];
+        if($request->input('action')=='add'){
+            $Purchase = $Purchase + [
+                'refer_no'               => $application_no,
+            ];
+            $response_data = Purchase::create($Purchase);
+            foreach ($request->item_list as $i=> $item){
+                $Purchase_details = array(
+                    'description'           =>  $item['description'],
+                    'purchaseId'            =>  $response_data->id,
+                    'qty'                   =>  $item['qty'],
+                    'rate'                  =>  $item['rate'],
+                    'part_number'           =>  $item['part_number'],
+                    'duration'              =>  $item['duration'],
+                    'amount'                =>  $item['amount'],
+                    'created_by'            =>  Session::get('User_details')['id'],
+                    'created_at'            =>  date('Y-m-d h:i:s')
+                );
+                PurchaseDetails::create($Purchase_details);
+            }
+        }
+
+        else{
+            $Purchase = $Purchase + [
+                'refer_no'               => $request->input('refer_no'),
+            ];
+            //updating with Id
+            $response_data = Purchase::where('id',$request->input('id'))->update($Purchase);
+            $response_data = PurchaseDetails::where('purchaseId',$request->input('id'))->delete();
+            foreach ($request->item_list as $i=> $item){
+                $Purchase_details = array(
+                    'description'           =>  $item['description'],
+                    'purchaseId'            =>  $request->input('id'),
+                    'qty'                   =>  $item['qty'],
+                    'rate'                  =>  $item['rate'],
+                    'part_number'           =>  $item['part_number'],
+                    'duration'              =>  $item['duration'],
+                    'amount'                =>  $item['amount'],
+                    'created_by'            =>  Session::get('User_details')['id'],
+                    'created_at'            =>  date('Y-m-d h:i:s')
+                );
+                PurchaseDetails::create($Purchase_details);
+            }
+        }
+    return $response_data;
+    }
+    //method to create invoice
     public function create_invoice(Request $request){
             $rules = [
                 'due_date'                  =>  'required',
@@ -214,6 +329,7 @@ class HomeController extends Controller
                     'totalAmount'           => $request->input('totalAmount'),
                     'totalAmountInWords'    => $request->input('totalAmountInWords'),
                     'Tpn_no'                => 'NAC00078',
+                    'status'                => 'Pending',
                     'academic_year'         => date('Y'),
                     // 'Bill_no'               => $application_no,
                     'userId'                => Session::get('User_details')['id'],
@@ -263,30 +379,60 @@ class HomeController extends Controller
     }
     //Listing all task list
     public function InvoiceList(){
-        $TaskDetails = Invoice::where('UserId',Session::get('User_details')['id'])->where('status', 'Pending')->get();
-        return $TaskDetails;
+            $InvoiceDetails = DB::table('Invoice as iv')
+                ->join('users as u','iv.UserId','=','u.id')
+                ->select('iv.*','u.name','u.system_role')
+                ->where('iv.status', 'Pending')
+                ->get();
+        return $InvoiceDetails;
+    }
+    public function PurchaseList(){
+        $PurchaseList = DB::table('purchase as p')
+        ->join('users as u','p.UserId','=','u.id')
+        ->select('p.*','u.name','u.system_role')
+        ->where('p.status', 'Pending')
+        ->get();
+    return $PurchaseList;
     }
 
     public function BillList(){
-        $userId = Session::get('User_details')['id'];
         $year = date('Y'); // Get the current year
         $month = date('m'); // Get the current month
-        
-        $BillList = Invoice::where('UserId', $userId)
-            ->whereRaw('YEAR(entry_date) = ? AND MONTH(entry_date) = ?', [$year, $month])
-            ->orderBy('entry_date', 'desc')
-            ->get();
+        $BillList = DB::table('Invoice as iv')
+        ->leftjoin('users as u','iv.reference_byId','=','u.id')
+        ->select('iv.*','u.name as recieved_by')
+        ->whereRaw('YEAR(entry_date) = ? AND MONTH(entry_date) = ?', [$year, $month])
+        ->orderBy('entry_date', 'desc')
+        ->get();
     
-        
         return $BillList;
+    }
+
+    public function PurchaseOrderList(){
+        $year = date('Y'); // Get the current year
+        $month = date('m'); // Get the current month
+        $PurchaseOrderList = DB::table('purchase as o')
+        ->leftjoin('users as u','o.receivedBy_id','=','u.id')
+        ->select('o.*','u.name as recieved_by')
+        ->whereRaw('YEAR(order_date) = ? AND MONTH(order_date) = ?', [$year, $month])
+        ->orderBy('order_date', 'desc')
+        ->get();
+        
+        return $PurchaseOrderList;
     }
 
     //pulling assigned task lists
 
     public function InvoiceDetails($id){
-        $TaskDetails = InvoiceDetails::where('invoiceId',$id)->get();
-        return $TaskDetails;
+        $InvoiceDetails = InvoiceDetails::where('invoiceId',$id)->get();
+        return $InvoiceDetails;
     }
+    public function PurchaseDetails($id){
+        $PurchaseDetails = PurchaseDetails::where('purchaseId',$id)->get();
+        return $PurchaseDetails;
+    }
+
+    
     //Fetching user details and task details by email and userId
     public function SearchUserByEmail($params){
         $paramdata = explode('__', $params);
@@ -309,11 +455,6 @@ class HomeController extends Controller
     //Deleting the user from system
     public function DeleteUser($id){
         $user_id = $id;
-        //checking for pending or under process task in system
-        $checktask = Invoice::where('userId',$user_id)->whereIn('taskStatus',['Pending','Under Process'])->first();
-        if($checktask!='' && $checktask!=null){
-            return 'taskExist';
-        }
        //Keeping user history
         $userHistory = UsersModel::where('id',$user_id)->first();
         if($userHistory!=null && $userHistory!=''){
@@ -339,96 +480,15 @@ class HomeController extends Controller
     }
     //pulling all system users
     public function getAllSystemUsers(){
-        $totalPending = 0;
-        $totalCompleted = 0;
-        $totalUnderProcess = 0;
         $allusers = DB::table('users as u')
         ->select('u.*','o.name as companyName')
         ->leftJoin('organization_details as o','u.org_id','=','o.id')
         ->where('u.system_role','not like','%admin%')
         ->where('u.status','1')
         ->get();
-        // $allusers = UsersModel::where('status', '1')->get();
-        foreach ($allusers as $user) {
-            $taskcounts = DB::table('Invoice')
-                ->select(
-                    DB::raw('COUNT(CASE WHEN taskStatus = "Pending" THEN 1 END) as pending'),
-                    DB::raw('COUNT(CASE WHEN taskStatus = "Completed" THEN 1 END) as completed'),
-                    DB::raw('COUNT(CASE WHEN taskStatus = "Under Process" THEN 1 END) as under_process')
-                )
-                ->where('userId', $user->id) // Assuming 'id' is the primary key column in the 'users' table
-                ->first();
-
-            // Assign the task counts to the user object
-            $user->pending_tasks = $taskcounts->pending;
-            $user->completed_tasks = $taskcounts->completed;
-            $user->under_process_tasks = $taskcounts->under_process;
-            
-            // Update the total counts
-            $totalPending += $taskcounts->pending;
-            $totalCompleted += $taskcounts->completed;
-            $totalUnderProcess += $taskcounts->under_process;
-            $user->total = $taskcounts->pending + $taskcounts->completed +  $taskcounts->under_process;
-        }
         return $allusers;
     }
 
-    //Assigning Task
-    public function Assign_task($parameters){
-        //Pulling username of user who have assign you task
-        $paramdata = explode('__', $parameters);
-        $PullingUserId = Invoice::where('id',$paramdata[0])->first();
-        if($PullingUserId){
-            $username = UsersModel::select('name','email')->where('id',$PullingUserId->userId)->first();
-        }
-        $newuser = [
-            'userId'     => $paramdata[1],
-            'ownership'  => 'Assigned by ' . $username->email,
-        ];
-        $TaskDetails = Invoice::where('id',$paramdata[0])->update($newuser);
-
-        //deleting for previous data
-        // if($paramdata[3]=='Re_assign'){
-        //     $TaskDetails = Invoice_history::where('id',$paramdata[4])->delete();
-        //         $content = "Dear " . $paramdata[5] . '<br> You have got new task assigned by ( ' .$username->email .'), Please login into the system and  check the deatils : ' 
-        //         . '<br>';
-        // }
-        // else{
-        //     $content = "Dear " . $paramdata[4] . '<br> You have got new task assigned by ( ' .$username->email .'), Please login into the system and  check the deatils : ' 
-        //     . '<br>';
-        // }
-        //Keeping history
-        $task_history = [
-            'parent_id'             => $PullingUserId->id,
-            'title'                 => $PullingUserId->title,
-            'description'           => $PullingUserId->description,
-            'priority'              => $PullingUserId->priority,
-            'due_date'              => $PullingUserId->due_date,
-            'taskStatus'            => $PullingUserId->taskStatus,
-            'status'                => $PullingUserId->status,
-            'userId'                => Session::get('User_details')['id'],
-            'ownership'             => 'Assigned to ' . $paramdata[2],
-        ];
-        // $TaskDetails = Invoice_history::create($task_history);
-
-        //Sending email notification
-        // if($TaskDetails){
-        //     $task_notification = [
-        //         'email'                 =>  $paramdata[2],
-        //         'subject'               =>  'Task Assigned',
-        //         'content'               =>  $content,
-        //         'bodyMessage'           =>  $content,
-        //     ];
-        //     $mail = Mail::send('emails.mail', $task_notification, function ($message) use ($task_notification) {
-        //         $message->from('taskinfo41@gmail.com');
-        //         $message->to($task_notification['email']);
-        //         $message->subject($task_notification['subject']);
-        //     });
-        //     if (Mail::failures())
-        //         return json_encode('email failed');
-        // }
-        // return $TaskDetails;
-    }
 
     //listing task by params
     public function BillListByParams($params){
@@ -457,20 +517,38 @@ class HomeController extends Controller
         return $billList;
         
     }
-    //Deleting the task re-assigning
-    // public function taskDeleteReAssigned($id){
-    //     $deletingReAssignTask = Invoice_history::where('parent_id',$id)->delete();
-    //     if($deletingReAssignTask){
-    //         $deletingTask = Invoice::where('id',$id)->delete();
-    //     }
-    //     return $deletingReAssignTask;
 
-    // }
-    //deleting bill
-
+    //pulling purchase order by parameter
+    public function PurchaseOrderListByParams($params){
+        $paramdata = explode('__', $params);
+        if($paramdata[0]=='Not_Received'){
+            $paramdata[0] = 'Pending';
+        }
+        $purchaseOrderList=[];
+        $fromDate = $paramdata[1];
+        $toDate = $paramdata[2];
+        if($paramdata[0]!='All'){
+            $purchaseOrderList = Purchase::where('status', $paramdata[0])
+                ->where('order_date', '>=', $fromDate)
+                ->where('order_date', '<=', $toDate)
+                ->get();
+        }
+        else{
+            $purchaseOrderList = Purchase::where('order_date', '>=', $fromDate)
+            ->where('order_date', '<=', $toDate)
+            ->get();
+        }
+        return $purchaseOrderList;
+    }
     public function InvoiceDelete($id){
         $Delete = Invoice::where('id',$id)->delete();
             InvoiceDetails::where('invoiceId',$id)->delete();
+        return $Delete;
+    }
+    //function to delete purchase order
+    public function DeletePurchase($id){
+        $Delete = Purchase::where('id',$id)->delete();
+            PurchaseDetails::where('purchaseId',$id)->delete();
         return $Delete;
     }
 
@@ -478,14 +556,14 @@ class HomeController extends Controller
     public function Received($id=""){
         $data = [
             'status'        => 'Received',
-            'received_date' => date('y-m-d'),
         ];
         $UpdateBill = Invoice::where('id',$id)->update($data);
         return $UpdateBill;
     }
     public function uploadBillDoc(Request $request){
-        //getting application number 
+        //inserting file path
         $file = $request->file;
+        if($file){
             if ($file != "undefined" && isset($request->existing_attachments) && $request->existing_attachments != null) {
                 $path = $request->existing_attachments;
                 unlink($path); //delete file and replace path from followng code
@@ -499,14 +577,48 @@ class HomeController extends Controller
                     $file_name = time() . '_' . $file->getClientOriginalName();
                     move_uploaded_file($file, $file_store_path . '/' . $file_name);
                     $path = $file_store_path . '/' . $file_name;
-                    
-                
+        }
         //updating document path by id
             $update_file = [
-                'bill_file' => $path,
+                'bill_file'         => $path,
+                'received_date'     => $request->dateOfRecieved,
+                'reference_number'  => $request->refNumber,
+                'reference_byId'    => Session::get('User_details')['id'],
             ];
             // Assuming 'Invoice' is the model for the database table
             $UploadFile = Invoice::where('id', $request->id)->update($update_file);
+        return $UploadFile;
+        }
+    }
+
+    //function to update file in purchase order 
+    public function uploadPurchaseOrderDoc(Request $request){
+        //inserting file path
+        $file = $request->file;
+        if($file){
+            if ($file != "undefined" && isset($request->existing_attachments) && $request->existing_attachments != null) {
+                $path = $request->existing_attachments;
+                unlink($path); //delete file and replace path from followng code
+            }
+            $path = '';
+                $file_store_path = config('services.constant.file_stored_base_path') . 'purchase_order';
+                if ($file != null && $file != "" && $file != "undefined") {
+                    if (!is_dir($file_store_path)) {
+                        mkdir($file_store_path, 0777, TRUE);
+                    }
+                    $file_name = time() . '_' . $file->getClientOriginalName();
+                    move_uploaded_file($file, $file_store_path . '/' . $file_name);
+                    $path = $file_store_path . '/' . $file_name;
+        }
+        //updating document path by id
+            $update_file = [
+                'purchase_file'     => $path,
+                'received_date'     => $request->dateOfRecieved,
+                'status'            => 'Received',
+                'receivedBy_id'     => Session::get('User_details')['id'],
+            ];
+            // Assuming 'Purchase' is the model for the database table
+            $UploadFile = Purchase::where('id', $request->id)->update($update_file);
         return $UploadFile;
         }
     }
@@ -523,7 +635,7 @@ class HomeController extends Controller
             ]);
             $file = $request->file('profilePicture');
             $path = "";
-            $file_store_path = 'userProfile';
+            $file_store_path = 'profile';
             
             if ($file !== null && $file->isValid()) {
                 $existingFile = "public/" . $request->profile_path;
@@ -595,32 +707,25 @@ class HomeController extends Controller
             return json_encode('Exception: ' . $e);
         } 
     }
-    public function taskDetails(){
-        if(Session::get('User_details')['system_role'] == 'User'){
-            $taskSummary = Invoice::where('userId',Session::get('User_details')['id'])->first();
-            if($taskSummary){
-                $counts = DB::table('Invoice')
-                    ->select(
-                        DB::raw('COUNT(CASE WHEN taskStatus = "Pending" THEN 1 END) as pending'),
-                        DB::raw('COUNT(CASE WHEN taskStatus = "Completed" THEN 1 END) as completed'),
-                        DB::raw('COUNT(CASE WHEN taskStatus = "Under Process" THEN 1 END) as under_process')
-                    )
-                    ->where('userId',Session::get('User_details')['id'])
-                    // ->groupBy('taskStatus')
-                    ->first();
-            }
-        }
-        else{
-            $counts = DB::table('Invoice')
-                    ->select(
-                        DB::raw('COUNT(CASE WHEN taskStatus = "Pending" THEN 1 END) as pending'),
-                        DB::raw('COUNT(CASE WHEN taskStatus = "Completed" THEN 1 END) as completed'),
-                        DB::raw('COUNT(CASE WHEN taskStatus = "Under Process" THEN 1 END) as under_process')
-                    )
-                    // ->groupBy('taskStatus')
-                    ->first();
-        }
+    //Pulling and displaying summary data in dashboard
+    public function DashboardDetails(){
+        $year = date('Y');
+        $userId = Session::get('User_details')['id'];
+        $userRole = Session::get('User_details')['system_role'];
+        
+        $query = DB::table('invoice')
+            ->select(
+                DB::raw('COUNT(CASE WHEN status = "Pending" THEN 1 END) as pending'),
+                DB::raw('COUNT(CASE WHEN status = "Received" THEN 1 END) as Received'),
+                DB::raw('COUNT(CASE WHEN academic_year = ' . $year . ' THEN 1 END) as total_bills')
+            );
+        if ($userRole == 'User') {
+            $query->where('userId', $userId);
+        } 
+        
+        $counts = $query->first();
         return $counts;
+        
 
     }
     public function change_password_for_user(Request $request){
@@ -634,7 +739,7 @@ class HomeController extends Controller
 
             //sending mail to user for information
             if ($password_reset_details) {
-                $content = "Your password has been reset by administrator to  $request->confirm_password for email $request->email in Task Management system ,<b> Please login with new password";
+                $content = "Your password has been reset by administrator to  $request->confirm_password for email $request->email in NET Billing System ,<b> Please login with new password";
                 // <p>Your password is: ******** (hidden for security reasons).</p>
                 $email = $request->email;
                     $passwordreset = [
@@ -654,56 +759,6 @@ class HomeController extends Controller
                 return '';
         }
         return 'Null';
-    }
-
-    //adding organization master
-    public function add_organization(Request $request){
-    //validating the fields
-        $rules = [
-            'name'          =>  'required',
-            'org_code'      =>  'required',
-            'description'   =>  'required',
-        ];
-
-        $customMessages = [
-            'name.required'         => 'The name field is required',
-            'org_code.required'     => 'Oranization code is required',
-            'description.required'  => 'Description required',
-        ];
-        $this->validate($request, $rules, $customMessages);  
-        //data preperation
-            $request_data = [
-                'id'                => $request->id,
-                'name'              => $request->name,
-                'org_code'          => $request->org_code,
-                'description'       => $request->description,
-                'created_by'        => Session::get('User_details')['id'],
-                'created_at'        => date('Y-m-d h:i:s'),
-            ];
-            //inserting/updating the data
-            if($request->action=='add'){
-                $insert_data = Organization::create($request_data);
-            }
-            else{
-                $insert_data = Organization::where('id',$request->id)->update($request_data);
-            }
-            return $insert_data;
-    }
-    //Listing all organization
-    public function orgListDetails(){
-        $organization_list = Organization::get();
-    return $organization_list;
-    }
-
-    // deleting organization by id
-    public function OrgDelete($id){
-    // checking if active user is mapped to this organization
-    $checkingUser = UsersModel::where('org_id',$id)->where('status','1')->get();
-    if( sizeof($checkingUser)){
-            return 'Active_user';
-        }   
-            $delete_org = Organization::where('id',$id)->delete();
-            return $delete_org;
     }
 
 //pulling notification
@@ -736,14 +791,12 @@ class HomeController extends Controller
             'password'          =>  'required|min:8',
             'confirm_password'  =>  'required|same:password',
             'role'              =>  'required',
-            'org_id'            =>  'required',
         ];
 
         $customMessages = [
             'name.required'                 => 'Name field is required',
             'contact_no.required'              => 'Contact field is required',
             'role.required'                 => 'Please select system role',
-            'org_id.required'               => 'Please select company',
             'email.required'                => 'Email field is required',
             'email.email'                   => 'Please enter a valid email address',
             'password.required'             => 'Password field is required',
@@ -762,7 +815,6 @@ class HomeController extends Controller
         $user_data = [
             'id'                => $request->id,
             'name'              => $request->name,
-            'org_id'            => $request->org_id,
             'email'             => $request->email,
             'system_role'       => $request->role,
             'phone_number'      => $request->contact_no,

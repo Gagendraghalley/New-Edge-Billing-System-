@@ -50,13 +50,13 @@
                                                 <td style="width: 50%">
                                                     <textarea name="text" class="form-control" v-model="item.particular"></textarea>
                                                 </td>
-                                                <td style="width: 7%">
+                                                <td style="width: 7%;vertical-align: middle; text-align: center;">
                                                     <input type="number" name="qty" class="form-control" v-model="item.qty" @change="updateAmount(index)">
                                                 </td>
-                                                <td style="width: 15%">
+                                                <td style="width: 15%;vertical-align: middle; text-align: center;">
                                                     <input type="number" name="rate" class="form-control" v-model="item.rate" @change="updateAmount(index)">
                                                 </td>
-                                                <td style="width: 20%">
+                                                <td style="width: 20%;vertical-align: middle; text-align: center;">
                                                     <input type="number" name="amount" class="form-control" v-model="item.amount" readonly>
                                                 </td>
                                             </tr>
@@ -72,7 +72,7 @@
                                                 <td colspan="2">
                                                     <p class="text-center"><b>Ngultrum: </b></p>
                                                 </td>
-                                                <td colspan="5">
+                                                <td colspan="5" style="vertical-align: middle; text-align: center;">
                                                     <span>{{ totalAmountInWords }} only </span>
                                                 </td>
                                             </tr>
@@ -219,7 +219,7 @@ export default {
             .then(() => {
                     Toast.fire({
                         icon: 'success',
-                        title: 'Details Updated Successfully'
+                        title: 'Details Saved Successfully'
                     })
                     this.$router.push('/list_invoice');
             })

@@ -10,13 +10,8 @@
                             <th style="font-weight: bold; font-family: 'Times New Roman'">Name</th>
                             <th style="font-weight: bold; font-family: 'Times New Roman'">Email Address</th>
                             <th style="font-weight: bold; font-family: 'Times New Roman'">Contact Number</th>
-                            <th style="font-weight: bold; font-family: 'Times New Roman'">Company Name</th>
                             <th style="font-weight: bold; font-family: 'Times New Roman'">Position Held</th>
                             <th style="font-weight: bold; font-family: 'Times New Roman'">System Role</th>
-                            <th style="font-weight: bold; font-family: 'Times New Roman'">Completed tasks</th>
-                            <th style="font-weight: bold; font-family: 'Times New Roman'">Under Process Tasks</th>
-                            <th style="font-weight: bold; font-family: 'Times New Roman'">Pending tasks</th>
-                            <th style="font-weight: bold; font-family: 'Times New Roman'">Total tasks</th>
                             <th style="font-weight: bold; font-family: 'Times New Roman'">Action</th>
                         </tr>
                     </thead>
@@ -26,13 +21,8 @@
                             <td>{{ user.name }}</td>
                             <td>{{ user.email }}</td>
                             <td>{{ user.phone_number }}</td>
-                            <td>{{ user.companyName }}</td>
                             <td>{{ user.position }}</td>
                             <td>{{ user.system_role }}</td>
-                            <td><span>{{ user.completed_tasks}}</span></td>
-                            <td><span>{{ user.under_process_tasks}}</span></td>
-                            <td><span>{{ user.pending_tasks}}</span></td>
-                            <td><span class="badge badge-secondary">{{ user.total}} </span></td>
                             <td>
                                 <a href="#" class="btn btn-danger btn-sm btn-flat text-white" @click="DeleteUser(user.id)" :disabled="isLoading"><i class="fa fa-trash"></i> Delete</a>
                             </td>

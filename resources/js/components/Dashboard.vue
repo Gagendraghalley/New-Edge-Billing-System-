@@ -5,7 +5,7 @@
                     <div class="card card-pending">
                         <div class="card-body">
                             <p class="card-title">
-                                <b><span class="title-icon">P</span>ending Tasks</b>
+                                <b><span class="title-icon">P</span>ending Bill(s) in {{ currentMonth }}</b>
                             </p>
                             <p class="card-text">{{ this.pending }}</p>
                         </div>
@@ -15,9 +15,9 @@
                     <div class="card card-completed">
                         <div class="card-body">
                             <p class="card-title">
-                                <b><span class="title-icon">C</span>ompleted Tasks</b>
+                                <b><span class="title-icon">B</span>ill(s) Received in {{ currentMonth }}</b>
                             </p>
-                            <p class="card-text">{{ this.completed }}</p>
+                            <p class="card-text">{{ this.Received }}</p>
                         </div>
                     </div>
                 </div>
@@ -25,9 +25,9 @@
                     <div class="card card-process">
                         <div class="card-body">
                             <p class="card-title">
-                                <b><span class="title-icon">P</span>rocess Tasks</b>
+                                <b><span class="title-icon">T</span>otals Bill(s) in {{ currentYear }}</b>
                             </p>
-                            <p class="card-text">{{ this.under_process }}</p>
+                            <p class="card-text">{{ this.total_bills }}</p>
                         </div>
                     </div>
                 </div>
@@ -51,13 +51,16 @@
 </template>
 <script>
 import Chart from 'chart.js';
+import { months } from 'moment';
 
 export default {
     data() {
         return {
+            currentYear: new Date().getFullYear(),
             pending: '0',
-            completed: '0',
-            under_process: '0',
+            Received: '0',
+            total_bills:'0',
+            // under_process: '0',
             pieChartData: null,
             barChartData: null,
             isLoading: false,
@@ -67,18 +70,18 @@ export default {
         async fetchDashboardDetails() {
             try {
                 this.isLoading = true;
-                const response = await axios.get('taskDetails');
+                const response = await axios.get('DashboardDetails');
                 const data = response.data;
                 if(data){
                     this.pending = data.pending;
-                    this.completed = data.completed;
-                    this.under_process = data.under_process;
+                    this.Received = data.Received;
+                    this.total_bills = data.total_bills;
                 // Generate chart data
                     this.pieChartData = {
-                        labels: ['Pending', 'Completed', 'Under Process'],
+                        labels: ['Pending Bill(s)', 'Bill(s) Received','Total Bill(s)'],
                         datasets: [
                             {
-                                data: [this.pending, this.completed, this.under_process],
+                                data: [this.pending, this.Received, this.total_bills],
                                 backgroundColor: ['#FF4B2B', '#36D1DC', '#8E2DE2'],
                                 hoverBackgroundColor: ['#FF4B2B', '#36D1DC', '#8E2DE2']
                             }
@@ -86,11 +89,11 @@ export default {
                     };
 
                     this.barChartData = {
-                        labels: ['Pending', 'Completed', 'Under Process'],
+                        labels: ['Pending Bill(s)', 'Bill(s) Received','Total Bill(s)'],
                         datasets: [
                             {
-                                label: 'Task Count',
-                                data: [this.pending, this.completed, this.under_process],
+                                label: 'Bill(s) Count',
+                                data: [this.pending, this.Received, this.total_bills],
                                 backgroundColor: ['#FF4B2B', '#36D1DC', '#8E2DE2'],
                                 hoverBackgroundColor: ['#FF4B2B', '#36D1DC', '#8E2DE2']
                             }
@@ -133,6 +136,20 @@ export default {
     },
     async mounted() {
         this.fetchDashboardDetails();
+
+    },
+    computed: {
+        currentMonth() {
+            const months = [
+                "January", "February", "March", "April",
+                "May", "June", "July", "August",
+                "September", "October", "November", "December"
+            ];
+
+            const currentDate = new Date();
+            const monthIndex = currentDate.getMonth();
+            return months[monthIndex];
+        }
     }
 };
 </script>

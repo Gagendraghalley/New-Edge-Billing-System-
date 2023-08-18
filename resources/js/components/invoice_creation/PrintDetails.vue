@@ -4,7 +4,7 @@
             <div class="report-header">
                 <div class="logo">
                     <img src="images/netlogo.png" alt="Company Logo" class="logo"><br>
-                        TPN No: <span><u>NAC00078</u></span>
+                    <br>
                 </div>
                 <div class="header-content">
                     <p class="report-title"><u>BILL</u></p>
@@ -12,23 +12,21 @@
                     <p class="report-subtitle">2<sup>nd</sup> Floor, City Mail Building, Thimphu</p>
                     <p class="report-subtitle small-subtitle">Post Box No: 1616</p>
                     <label class="text-center">
-                        <label>Bill No: <span><u>{{ form.Bill_no }}</u></span></label>
+                        TPN No: <span><u>NAC00078</u></span>
                     </label>
-                </div>
-                <div class="logo">
-                    
-                    <label class="logo">
-                            A/C No: <span><u>1234566</u></span>
-                    </label><br>
-                    <label class="logo">
-                            <span>Bank of Bhutan</span>
-                    </label><br>
-                    <label class="logo">
-                        <label>Date: <span><u>{{ form.entry_date }}</u></span></label>
-                    </label><br>
                 </div>
             </div>
         <!-- Form Content -->
+            <div class="row form-group">
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+                    <label>Bill No: <span><u>{{ form.Bill_no }}</u></span></label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label>Date: <span><u>{{ form.entry_date }}</u></span></label>
+                    <label>Due Date: <span><u>{{ form.due_date }}</u></span></label>
+                </div>
+            </div>
+            <hr>
             <div class="report-content">
                 <form class="change-password-form">
                     <div class="row form-group">
@@ -40,9 +38,6 @@
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                             <label>Work Order No: <span>{{ this.form.workorderNo }}</span></label>
                         </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                            
-                        </div>
                     </div>
                     <div class="form-group row" ref="pdfContent">
                         <div class="col-12">
@@ -50,36 +45,48 @@
                                 <table class="table table-sm table-bordered table-striped">
                                     <thead>
                                         <tr>
-                                            <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Sl.No</th>
+                                            <th style='font-weight: bold; width: 10%;font-family: "Times New Roman", Times, serif'>Sl.No</th>
                                             <th style='font-weight: bold; width: 50%; font-family: "Times New Roman", Times, serif'>Particulars</th>
-                                            <th style='font-weight: bold;width: 7%;font-family: "Times New Roman", Times, serif'>Quantity</th>
+                                            <th style='font-weight: bold;width: 10%;font-family: "Times New Roman", Times, serif'>Quantity</th>
                                             <th style='font-weight: bold;width: 15%;font-family: "Times New Roman", Times, serif'>Rate</th>
-                                            <th style='font-weight: bold;width: 20%;font-family: "Times New Roman", Times, serif'>Amount</th>
+                                            <th style='font-weight: bold;width: 15%;font-family: "Times New Roman", Times, serif'>Amount</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="(item, index) in form.item_list" :key="index">
-                                            <td>{{ index + 1 }} </td>
+                                            <td style="width: 10%; height: 100%; overflow-y: auto;">{{ index + 1 }} </td>
                                             <td style="width: 50%; height: 100%; overflow-y: auto;">
                                                 <div v-text="item.particular"></div>
                                             </td>
 
-                                            <td style="width: 7%">
+                                            <td style="width: 10%">
                                                 <div class="form-control" v-text="item.qty"></div>
                                             </td>
                                             <td style="width: 15%">
                                                 <div class="form-control" v-text="item.rate"></div>
                                             </td>
-                                            <td style="width: 20%">
+                                            <td style="width: 15%">
                                                 <div class="form-control" v-text="item.amount"></div>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td colspan="2">
-                                                <p class="text-center"><b>Net Amount: </b></p>
+                                                <p class="text-center">Net Amount(Nu)</p>
+                                            </td>
+                                            <td colspan="4">
+                                                <div class="form-control" v-text="this.form.totalAmount"></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                <div class="form-group">
+                                                    <p class="text-center">Amount In words (Ngultrum ) </p>
+                                                </div>
                                             </td>
                                             <td colspan="5">
-                                                <div class="form-control" v-text="this.form.totalAmount"></div>
+                                                <div class="form-group">
+                                                    <p> {{ this.totalAmountInWords }} Only </p>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -88,6 +95,8 @@
                                                 <ul>
                                                     <li>Interest @15% p.a will be charge if the payment is not made within in the stipulated time</li>
                                                 </ul>
+                                                    <p><b>A/C No: <span><u>1234566</u></span></b></p>
+                                                    <p><b><span>Bank of Bhutan</span></b></p>
                                             </td>
                                         </tr>
                                         <tr>
@@ -98,21 +107,13 @@
                                                 </ul>
                                             </td>
                                         </tr>
-                                            
+                                        
                                         <tr>
-                                            <td colspan="1">
-                                                <p class="text-center"><b>Amount In Words: </b></p>
-                                            </td>
-                                            <td colspan="5">
-                                                <p>Nu:<b> {{ totalAmountInWords }} only</b></p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">
+                                            <td colspan="2" style="width: 40px">
                                                 <p><b>Recieved by:  </b></p>
                                             </td>
-                                            <td colspan="4">
-                                                <p><b>For New Edge Technologies: </b></p>
+                                            <td colspan="4" style="width: 40px">
+                                                <p><b>New Edge Technologies: </b></p>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -171,8 +172,8 @@ export default {
             style.innerHTML = `
                 @media print {
                     body {
-                        width: 100%;
-                        height: 100%;
+                        width: 100%; /* Set body width to 100% */
+                        height: 100%; /* Set body height to 100% */
                         margin: 0;
                         padding: 0;
                         overflow: hidden;
@@ -182,15 +183,21 @@ export default {
                     @page {
                         size: A4 portrait; /* Set the desired paper size and orientation */
                         margin: 0; /* Remove any default margins */
+                        mso-footer-space: 0; /* Hide system footer for IE */
+                        footer: _blank; /* Hide system footer for other browsers */
                     }
 
-                    /* Hide system footer */
-                    @page {
-                        size: A4 portrait; /* Set the desired paper size and orientation */
-                        margin: 0;
-                        mso-footer-space: 0;
+                    /* Adjust table layout for printing */
+                    table {
+                        table-layout: fixed;
                     }
-
+                    
+                    /* Customize your report container for printing */
+                    .report-container {
+                        width: 100%; /* Make sure report container covers the width of the page */
+                        height: 100%; /* Make sure report container covers the height of the page */
+                    }
+                    
                     /* Add more styles to adjust the content as needed */
                 }
             `;

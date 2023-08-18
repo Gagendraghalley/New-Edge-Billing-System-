@@ -4,15 +4,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon"  href="{{ asset('images/profile.png') }}">
-    <title>NET Billing System</title>
+    <link rel="shortcut icon"  href="{{ asset('images/netlogo.png') }}">
+    <title>NET ERP System</title>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="js/app.js"></script>
 </head>
 <body class="hold-transition login-page" style="background-image: url('images/background.jpg'); background-size: cover; background-repeat: no-repeat; backdrop-filter: blur(3px);">
     <div class="title m-b-md">
-        <span style="color:white"><h3><b> NET Billing System</b></h3></span>
+        <span style="color:white"><h3><b> NET ERP System</b></h3></span>
     </div>
     <div class="login-box">
         <div class="login-logo bg-secondary text-white">
