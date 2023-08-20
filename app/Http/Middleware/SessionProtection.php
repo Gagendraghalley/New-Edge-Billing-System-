@@ -6,10 +6,11 @@ use Closure;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
-class CheckSession
+class SessionProtection
 {
     public function handle($request, Closure $next)
     {
+        // Check if the user is authenticated and the session is active
         if (Auth::check() && !Session::has('lastActivity')) {
             Session::put('lastActivity', time());
         }
@@ -25,4 +26,3 @@ class CheckSession
         return $next($request);
     }
 }
-
