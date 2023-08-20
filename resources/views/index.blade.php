@@ -65,9 +65,9 @@
     <body style="background-image: url('images/background.jpg'); background-size: cover; background-repeat: no-repeat">
         <div class="flex-center position-ref full-height" style="backdrop-filter: blur(3px);">
             <div class="top-right links">
-                <a href="{{ url('new_register') }}">
+                <!-- <a href="{{ url('new_register') }}">
                     <span style="color:#FF4B2B">Register</span> 
-                </a>
+                </a> -->
                 <a href="{{ url('login_screen') }}">
                     <span style="color:#FF4B2B">Login</span>
                 </a>

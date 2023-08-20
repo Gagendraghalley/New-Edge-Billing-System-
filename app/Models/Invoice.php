@@ -11,7 +11,7 @@ class Invoice extends Model
        //For generating UUID
         use HasFactory, Uuid;
         public $timestamps = false;
-        protected $table = "invoice";
+        protected $table = "Invoice";
         protected $fillable = [
             'id' ,               
             'entry_date',

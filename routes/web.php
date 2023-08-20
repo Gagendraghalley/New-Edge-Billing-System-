@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('index');
 });
+Route::group(['middleware' => 'checksession'], function () {
+    // Routes that require active sessions
+});
 Route::get('/new_register', [App\Http\Controllers\Admin\HomeController::class, 'user_register'])->name('user_register');
 Route::get('/login_screen', [App\Http\Controllers\Admin\HomeController::class, 'login_screen'])->name('login_screen');
 Route::get('/userlogin', [App\Http\Controllers\Admin\HomeController::class, 'userlogin'])->name('userlogin');
@@ -15,6 +18,7 @@ Route::post('/change_password_for_user', [App\Http\Controllers\Admin\HomeControl
 Route::post('/UpdatePerDetails', [App\Http\Controllers\Admin\HomeController::class, 'UpdatePerDetails'])->name('UpdatePerDetails');
 Route::get('/getPersonalDetails/{id}', [App\Http\Controllers\Admin\HomeController::class, 'getPersonalDetails'])->name('getPersonalDetails');
 Route::get('/DashboardDetails', [App\Http\Controllers\Admin\HomeController::class, 'DashboardDetails'])->name('DashboardDetails');
+Route::get('/fetchDashboardDetailsForGraph', [App\Http\Controllers\Admin\HomeController::class, 'fetchDashboardDetailsForGraph'])->name('fetchDashboardDetailsForGraph');
 Route::get('/getAllSystemUsers', [App\Http\Controllers\Admin\HomeController::class, 'getAllSystemUsers'])->name('getAllSystemUsers');
 
 //deleting user

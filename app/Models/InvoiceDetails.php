@@ -10,7 +10,7 @@ class InvoiceDetails extends Model
 {
     use HasFactory, Uuid;
     public $timestamps = false;
-    protected $table="invoice_details";
+    protected $table="Invoice_details";
     protected $fillable = [
             'id',
             'particular',

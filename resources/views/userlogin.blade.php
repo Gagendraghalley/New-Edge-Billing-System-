@@ -23,6 +23,13 @@
                 <div id="loginsection">
                     <form action="/userlogin" method="get">
                         @csrf
+                        <!-- session out message -->
+                        @if(session('session_expired'))
+                            <div class="alert alert-warning">
+                                {{ session('session_expired') }}
+                            </div>
+                        @endif
+
                         @if($Invalid!=null)
                         <div class="alert alert-success col-12"> {{ $Invalid }}</div>
                         @endif

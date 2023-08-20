@@ -713,7 +713,7 @@ class HomeController extends Controller
         $userId = Session::get('User_details')['id'];
         $userRole = Session::get('User_details')['system_role'];
         
-        $query = DB::table('invoice')
+        $query = DB::table('Invoice')
             ->select(
                 DB::raw('COUNT(CASE WHEN status = "Pending" THEN 1 END) as pending'),
                 DB::raw('COUNT(CASE WHEN status = "Received" THEN 1 END) as Received'),
@@ -728,6 +728,20 @@ class HomeController extends Controller
         
 
     }
+        //Pulling and displaying summary data in graph
+        public function fetchDashboardDetailsForGraph(){
+            $year = date('Y');
+            $month = date('m'); // Get the current month
+            $userId = Session::get('User_details')['id'];
+            $userRole = Session::get('User_details')['system_role'];
+            $pending_bill = DB::table('Invoice')
+                            ->select('due_date','addressTo')
+                            ->where('status','Pending')
+                            ->whereRaw('academic_year = ? AND MONTH(due_date) = ?', [$year, $month])
+                            ->get();
+            
+            return $pending_bill;
+        }
     public function change_password_for_user(Request $request){
         //checking the entered email is registrered in the system or not
         $emailchecking = UsersModel::where('email',$request->email)->first();

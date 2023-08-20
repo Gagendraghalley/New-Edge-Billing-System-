@@ -25,7 +25,7 @@
                     <div class="card card-process">
                         <div class="card-body">
                             <p class="card-title">
-                                <b><span class="title-icon">T</span>otals Bill(s) in {{ currentYear }}</b>
+                                <b><span class="title-icon">T</span>otals Bill(s) in year {{ currentYear }}</b>
                             </p>
                             <p class="card-text">{{ this.total_bills }}</p>
                         </div>
