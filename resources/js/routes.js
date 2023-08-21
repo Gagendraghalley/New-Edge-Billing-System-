@@ -6,6 +6,7 @@ export default [
     { path: '/passReset', component: require('./components/profile/password_reset.vue').default },
     { path: '/PrintDetails',name:'PrintDetails', component: require('./components/invoice_creation/PrintDetails.vue').default },
     { path: '/Printpurchase_order',name:'Printpurchase_order', component: require('./components/purchase_order/Printpurchase_order.vue').default },
+    { path: '/PrintMoneyReceipt',name:'PrintMoneyReceipt', component: require('./components/bill_update/PrintMoneyReceipt.vue').default },
     
 
     //Creating and listing own task

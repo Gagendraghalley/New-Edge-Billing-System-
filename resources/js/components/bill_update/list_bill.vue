@@ -50,48 +50,60 @@
                 <tr>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Sl.No.</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Bill Number</th>
-                    <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Total Amount</th>
-                    <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Reference Number</th>
+                    <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Ref Number</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Address To</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Entry Date</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Due Date</th>
+                    <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Bill Amount</th>
+                    <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>TDS</th>
+                    <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Amount Received</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Recieved Date</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Bill Recieved By</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Bill Status</th>
+                    <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Money Receipt</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Number of Day(s)</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Action</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(task, index) in BillList" :key="index">
+                <tr v-for="(bills, index) in BillList" :key="index">
                     <td>{{ index + 1 }} </td>
-                    <td>{{ task.Bill_no }}</td>
-                    <td>Nu. {{ task.totalAmount }} </td>
-                    <td v-if="task.reference_number">{{ task.reference_number }} </td>
+                    <td>{{ bills.Bill_no }}</td>
+                    <td v-if="bills.reference_number">{{ bills.reference_number }} </td>
                     <td v-else></td>
-                    <td>{{ task.addressTo }} </td>
-                    <td>{{ task.entry_date }} </td>
-                    <td>{{ task.due_date }} </td>
-                    <td v-if=" task.due_date < task.received_date"><span class="text-danger"> {{ task.received_date }}</span> </td>
-                    <td v-else><span class="text-success"> {{ task.received_date }}</span> </td>
-                    <td>{{ task.recieved_by }} </td>
-                    <td v-if="task.status == 'Pending'"><span class="text-info">Not Received</span></td>
+                    <td>{{ bills.addressTo }} </td>
+                    <td>{{ bills.entry_date }} </td>
+                    <td>{{ bills.due_date }} </td>
+                    <td>Nu. {{ bills.totalAmount }} </td>
+                    <td v-if="bills.tds">Nu. {{ bills.tds }}</td>
+                    <td v-else-if="bills.tds == 0">Nu. 0</td>
+                    <td v-else>...</td>
+                    <td v-if="bills.amount_received">Nu. {{ bills.amount_received }} </td>
+                    <td v-else-if="bills.amount_received==0">Nu. 0</td>
+                    <td v-else>...</td>
+                    <td v-if=" bills.due_date < bills.received_date"><span class="text-danger"> {{ bills.received_date }}</span> </td>
+                    <td v-else><span class="text-success"> {{ bills.received_date }}</span> </td>
+                    <td>{{ bills.recieved_by }} </td>
+                    <td v-if="bills.status == 'Pending'"><span class="text-info">Not Received</span></td>
                     <td v-else><span class="text-success">Received</span></td>
-
-                    <td v-if="task.status=='Pending'">
-                        <span :style="{ color: calculateDateDifference(task.entry_date, task.due_date) < 0 ? 'red' : 'black' }">
-                            {{ calculateDateDifference(task.entry_date, task.due_date) < 0 ? ' ' + Math.abs(calculateDateDifference(task.entry_date, task.due_date)) + ' day(s) Overdue(s)' : calculateDateDifference(task.entry_date, task.due_date) + ' day(s) left' }}
+                    <td v-if="bills.status === 'Received'">
+                        <a  href="#" class="btn btn-info btn-sm btn-flat text-white" @click="MoneyReceipt(bills)"><i class="fa fa-print"></i> Print</a>
+                    </td>
+                    <td v-else>...</td>
+                    <td v-if="bills.status=='Pending'">
+                        <span :style="{ color: calculateDateDifference(bills.entry_date, bills.due_date) < 0 ? 'red' : 'black' }">
+                            {{ calculateDateDifference(bills.entry_date, bills.due_date) < 0 ? ' ' + Math.abs(calculateDateDifference(bills.entry_date, bills.due_date)) + ' day(s) Overdue(s)' : calculateDateDifference(bills.entry_date, bills.due_date) + ' day(s) left' }}
                         </span>
                     </td>
                     <td v-else>
-                        <span :style="{ color: calculateDateDifference(task.received_date, task.due_date) < 0 ? 'red' : 'black' }">
-                            {{ calculateDateDifference(task.received_date, task.due_date) < 0 ? 'Overdue(s) By ' + Math.abs(calculateDateDifference(task.received_date, task.due_date)) + ' Day(s) ' : 'Received Before ' +calculateDateDifference(task.received_date, task.due_date) + ' Day(s)' }}
+                        <span :style="{ color: calculateDateDifference(bills.received_date, bills.due_date) < 0 ? 'red' : 'black' }">
+                            {{ calculateDateDifference(bills.received_date, bills.due_date) < 0 ? 'Overdue(s) By ' + Math.abs(calculateDateDifference(bills.received_date, bills.due_date)) + ' Day(s) ' : 'Received Before ' +calculateDateDifference(bills.received_date, bills.due_date) + ' Day(s)' }}
                         </span>
                     </td>
                     <td style="font-weight: bold; font-family: 'Times New Roman', Times, serif">
-                        <a v-if="task.status === 'Pending'  && system_role!=='View'" href="#" class="btn btn-info btn-sm btn-flat text-white" @click="Recieved(task.id)"><i class="fa fa-edit"></i> Received</a>
-                        <a v-else-if="task.bill_file" href="#" @click="openFile(task.bill_file)" download>
-                            <i :class="getFileIconClass(task.bill_file)"> </i> {{ task.Bill_no }}
+                        <a v-if="bills.status === 'Pending'  && system_role!=='View'" href="#" class="btn btn-info btn-sm btn-flat text-white" @click="Recieved(bills.id)"><i class="fa fa-edit"></i> Received</a>
+                        <a v-else-if="bills.bill_file" href="#" @click="openFile(bills.bill_file)" download>
+                            <i :class="getFileIconClass(bills.bill_file)"> </i> {{ bills.Bill_no }}
                         </a>
                         <a v-else>
                             No Document Uploaded
@@ -107,7 +119,7 @@ import Errors from '../../Errors.js';
 export default {
     components: {
         props: {
-            task: {
+            bills: {
             type: Object,
             required: true,
             },
@@ -138,6 +150,10 @@ export default {
             file_path=file_path.replaceAll('/', 'SSS');
             let uri = 'viewFiles/'+file_path;
             window.open(uri,"_black");
+        },
+        //Printing Money Receipt
+        MoneyReceipt(data){
+            this.$router.push({name:"PrintMoneyReceipt",params:{data:data}});
         },
 
         //identifing file and displaying icon based on file type
@@ -176,7 +192,7 @@ export default {
             this.$router.push({name:"PrintDetails",params:{data:data}});
         },
 
-        //Loading all task list by userId
+        //Loading all bills list by userId
         BillListDetails(){
             this.BillList =[];
             let uri="";
@@ -246,12 +262,16 @@ export default {
             const today = new Date().toISOString().split("T")[0];  // Get current date in YYYY-MM-DD format
             const inputHtml = `
                 <div class="input-group">
-                    <label for="textInput">Bill Refers No:  <span class="text-danger">*</span> &nbsp </label>
+                    <label for="textInput">Bill Ref No:  <span class="text-danger">*</span> &nbsp </label>
                     <input type="text" id="textInput" class="form-control" required>
                 </div><br>
                 <div class="input-group">
                     <label for="dateInput">Received Date: <span class="text-danger">*</span> &nbsp</label>
                     <input type="date" id="dateInput" class="form-control" required max="${today}">
+                </div><br>
+                <div class="input-group">
+                    <label for="tds">TDS(In amount): <span class="text-danger">*</span> &nbsp</label>
+                    <input type="number" id="tds" class="form-control" required>
                 </div><br>
                 <div class="input-group">
                     <label for="fileInput">Attach Document (optional):</label>
@@ -287,9 +307,11 @@ export default {
                     const textInput = document.getElementById('textInput');
                     const dateInput = document.getElementById('dateInput');
                     const fileInput = document.getElementById('fileInput');
+                    const tds = document.getElementById('tds');
+                    
                     const errorMsg = document.querySelector('.error-msg');
                     
-                    if (!textInput.value.trim() || !dateInput.value) {
+                    if (!tds.value.trim() ||!textInput.value.trim() || !dateInput.value) {
                         this.showErrorMessage('Please fill out all required fields.');
                         return false; // Prevent closing the modal
                     }
@@ -302,11 +324,13 @@ export default {
                     const textInput = document.getElementById('textInput');
                     const dateInput = document.getElementById('dateInput');
                     const fileInput = document.getElementById('fileInput');
+                    const tds = document.getElementById('tds');
 
                     const formData = new FormData();
                     formData.append('file', fileInput.files[0]);
                     formData.append('id', id);
                     formData.append('refNumber', textInput.value);
+                    formData.append('tds', tds.value);
                     formData.append('dateOfRecieved', dateInput.value);
 
                     axios.post('uploadBillDoc/', formData) // Replace 'UploadEndpoint' with the actual upload URL

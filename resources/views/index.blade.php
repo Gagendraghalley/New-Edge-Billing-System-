@@ -73,14 +73,14 @@
                 </a>
             </div>
             <div class="content">
-                <div class="title m-b-md">
+                <div class="title m-b-md col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <h3>
                         <b>
                             <span>
-                                <span class="title-icon">N</span>ew
-                                <span class="title-icon">E</span>dge 
-                                <span class="title-icon">E</span>RP
-                                <span class="title-icon">S</span>ystem
+                            &nbsp;<span class="title-icon">N</span>et &nbsp;
+                                <span class="title-icon">E</span>asy &nbsp;
+                                <span class="title-icon">B</span>illing &nbsp;
+                                <span class="title-icon">S</span>ystem &nbsp;
                             </span>
                         </b>
                     </h3>

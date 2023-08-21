@@ -119,7 +119,7 @@
                     <div class="form-group row text-right d-print-none">
                         <div class="btn-group ml-auto mr-4 mt-2 mb-0">
                             <button type="button" class="btn btn-outline-primary btn-sm" @click="startPrint">
-                                <i class="fas fa-print"></i> Print Invoice
+                                <i class="fas fa-print"></i> Print Purchase Order
                             </button>
                         </div>
                     </div>

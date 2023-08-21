@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'NET ERP System'),
+    'name' => env('APP_NAME', 'NET Easy Billing System'),
 
     'version' => env('APP_VERSION', '1.0.1'),
 

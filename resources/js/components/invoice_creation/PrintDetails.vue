@@ -91,29 +91,33 @@
                                         </tr>
                                         <tr>
                                             <td colspan="5">
-                                                <p class="text-center"><b><u>Term & Condition</u></b></p>
-                                                <ul>
-                                                    <li>Interest @15% p.a will be charge if the payment is not made within in the stipulated time</li>
+                                                <div class="bank-details">
+                                                <p class="bank-title"><u>Bank Details</u></p>
+                                                <ul class="bank-list">
+                                                    <li><span class="bank-name">BOB:</span> 100901568</li>
+                                                    <li><span class="bank-name">BNB:</span> 0000053343027</li>
+                                                    <li><span class="bank-name">BDB:</span> 201800025601</li>
+                                                    <li><span class="bank-name">DPNB:</span> 990210000556</li>
                                                 </ul>
-                                                    <p><b>A/C No: <span><u>1234566</u></span></b></p>
-                                                    <p><b><span>Bank of Bhutan</span></b></p>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td colspan="5">
                                                 <p class="text-center"><b><u>Declaration</u> </b></p>
-                                                <ul>
-                                                    <li>We declare here that all we mentioned are true and correct</li>
+                                                <ul style="font-style: italic">
+                                                    <li>This is system generated Bill and  all the bill information provided are true and correct.</li>
+                                                    <li>Bills oustanding over the due date are subject to a 1% per day late payment penalty.</li>
                                                 </ul>
                                             </td>
                                         </tr>
                                         
                                         <tr>
                                             <td colspan="2" style="width: 40px">
-                                                <p><b>Recieved by:  </b></p>
+                                                <p><b>Recieved by:  </b></p> <br><br><br>
                                             </td>
                                             <td colspan="4" style="width: 40px">
-                                                <p><b>New Edge Technologies: </b></p>
+                                                <p><b>New Edge Technologies: </b></p><br><br><br>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -261,6 +265,39 @@ export default {
 }
 </script>
 <style>
+    .bank-details {
+    margin-top: 10px;
+    padding: 5px;
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    }
+
+.bank-title {
+    font-size: 15px;
+    text-align: center;
+    text-decoration: underline;
+    margin-bottom: 5px;
+    color: #333;
+    }
+
+.bank-list {
+    list-style-type: none;
+    padding-left: 10px;
+    font-style:normal;
+    }
+
+.bank-list li {
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #555;
+    }
+
+.bank-name {
+    font-weight: bold;
+    color: #333;
+    margin-right: 5px;
+    }
 .report-header {
         display: flex;
         align-items: center;

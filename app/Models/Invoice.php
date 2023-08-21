@@ -21,6 +21,8 @@ class Invoice extends Model
             'addressTo',
             'workorderNo',
             'totalAmount',
+            'tds',
+            'amount_received',
             'totalAmountInWords',
             'Tpn_no',
             'Bill_no',

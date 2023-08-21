@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>{{ config('app.nam', 'NET ERP System') }}</title>
+  <title>{{ config('app.nam', 'NET Easy Billing System') }}</title>
   <link rel="stylesheet" href="{{ mix('/css/app.css') }}">
-  <link rel="shortcut icon"  href="{{ asset('images/netlogo.png') }}">
+  <link rel="shortcut icon"  href="{{ asset('images/logo.png') }}">
 </head>
 
 <body class="hold-transition sidebar-mini" >
@@ -46,7 +46,7 @@
         @endphp
         <img id="profileImage" src="{{ asset('storage/' . $profilePath) }}" alt="no image" class="brand-image img-circle elevation-3" style="opacity: .8; border-radius: 50%;">
         <!-- <img src="{{ asset('/images/profile.png') }}" alt="Profile" class="brand-image img-circle elevation-3" style="opacity: .8;border-radius: 50%;"> -->
-        <span class="brand-text font-weight-light text-white">{{ config('app.nam', ' NET ERP System') }}</span>
+        <span class="brand-text font-weight-light text-white">{{ config('app.nam', ' NET Easy Billing System') }}</span>
       </router-link>
       <hr>
       <div class="popup" id="comingSoonPopup">
@@ -67,7 +67,7 @@
       <div class="float-right d-none d-sm-block">
         <b>Version</b> 1.0.0
       </div>
-      <strong>&copy; <span id="currentYear"></span> <a href="#">NET ERP System Web Application</a>. All rights reserved.</strong>
+      <strong>&copy; <span id="currentYear"></span> <a href="http://erp.newedge.bt/">NET Easy Billing System Web Application</a>. All rights reserved.</strong>
     </footer>
   </div>
   <script src="{{ mix('/js/app.js') }}"></script>

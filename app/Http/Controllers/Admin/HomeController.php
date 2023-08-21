@@ -140,12 +140,12 @@ class HomeController extends Controller
                     . '<br>. Thank you for registration.';
                     $registration_data = [
                         'email'                 =>  $request->email,
-                        'subject'               =>  'New Registration',
+                        'subject'               =>  'User Registration',
                         'content'               =>  $content,
                         'bodyMessage'           =>  $content,
                     ];
                 $mail = Mail::send('emails.registration', $registration_data, function ($message) use ($registration_data) {
-                        $message->from('taskinfo41@gmail.com');
+                        $message->from('easybillingsystem.net@gmail.com');
                         $message->to($registration_data['email']);
                         $message->subject($registration_data['subject']);
                     });
@@ -554,11 +554,12 @@ class HomeController extends Controller
 
     //Updating bill
     public function Received($id=""){
+       
         $data = [
             'status'        => 'Received',
         ];
-        $UpdateBill = Invoice::where('id',$id)->update($data);
-        return $UpdateBill;
+        $Received = Invoice::where('id',$id)->update($data);
+        return $Received;
     }
     public function uploadBillDoc(Request $request){
         //inserting file path
@@ -578,10 +579,20 @@ class HomeController extends Controller
                     move_uploaded_file($file, $file_store_path . '/' . $file_name);
                     $path = $file_store_path . '/' . $file_name;
         }
+         //pulling total amount to minus from tds
+            $total_amount = Invoice::select('totalAmount')->where('id', $request->id)->first();
+            if ($total_amount) {
+                $amount_received = $total_amount->totalAmount - $request->tds;
+            } else {
+                // Handle the case where no invoice is found for the given ID
+                // For example, you can set a default value for $amount_received or show an error message.
+            }
         //updating document path by id
             $update_file = [
                 'bill_file'         => $path,
                 'received_date'     => $request->dateOfRecieved,
+                'tds'               => $request->tds,
+                'amount_received'   => $amount_received,
                 'reference_number'  => $request->refNumber,
                 'reference_byId'    => Session::get('User_details')['id'],
             ];
@@ -695,7 +706,7 @@ class HomeController extends Controller
                     'bodyMessage'           =>  $content,
                 ];
                 $mail = Mail::send('emails.passwordMail', $passwordchange, function ($message) use ($passwordchange) {
-                    $message->from('taskinfo41@gmail.com');
+                    $message->from('easybillingsystem.net@gmail.com');
                     $message->to($passwordchange['email']);
                     $message->subject($passwordchange['subject']);
                 });
@@ -763,7 +774,7 @@ class HomeController extends Controller
                         'bodyMessage'           =>  $content,
                     ];
                     $mail = Mail::send('emails.passwordMail', $passwordreset, function ($message) use ($passwordreset) {
-                        $message->from('taskinfo41@gmail.com');
+                        $message->from('easybillingsystem.net@gmail.com');
                         $message->to($passwordreset['email']);
                         $message->subject($passwordreset['subject']);
                     });
@@ -856,7 +867,7 @@ class HomeController extends Controller
                     'bodyMessage'           =>  $content,
                 ];
             $mail = Mail::send('emails.registration', $registration_data, function ($message) use ($registration_data) {
-                $message->from('taskinfo41@gmail.com');
+                $message->from('easybillingsystem.net@gmail.com');
                 $message->to($registration_data['email']);
                 $message->subject($registration_data['subject']);
             });
