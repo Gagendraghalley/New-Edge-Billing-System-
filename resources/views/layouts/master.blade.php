@@ -46,7 +46,7 @@
         @endphp
         <img id="profileImage" src="{{ asset('storage/' . $profilePath) }}" alt="no image" class="brand-image img-circle elevation-3" style="opacity: .8; border-radius: 50%;">
         <!-- <img src="{{ asset('/images/profile.png') }}" alt="Profile" class="brand-image img-circle elevation-3" style="opacity: .8;border-radius: 50%;"> -->
-        <span class="brand-text font-weight-light text-white">{{ config('app.nam', ' NET Easy Billing System') }}</span>
+        <span class="brand-text font-weight-light text-white">{{ config('app.nam', ' NET Billing System') }}</span>
       </router-link>
       <hr>
       <div class="popup" id="comingSoonPopup">

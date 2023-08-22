@@ -59,6 +59,7 @@
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Amount Received</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Recieved Date</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Bill Recieved By</th>
+                    <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Receipt No</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Bill Status</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Money Receipt</th>
                     <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Number of Day(s)</th>
@@ -84,6 +85,8 @@
                     <td v-if=" bills.due_date < bills.received_date"><span class="text-danger"> {{ bills.received_date }}</span> </td>
                     <td v-else><span class="text-success"> {{ bills.received_date }}</span> </td>
                     <td>{{ bills.recieved_by }} </td>
+                    <td v-if="bills.Receipt_no">{{ bills.Receipt_no }} </td>
+                    <td v-else>..</td>
                     <td v-if="bills.status == 'Pending'"><span class="text-info">Not Received</span></td>
                     <td v-else><span class="text-success">Received</span></td>
                     <td v-if="bills.status === 'Received'">
@@ -262,7 +265,7 @@ export default {
             const today = new Date().toISOString().split("T")[0];  // Get current date in YYYY-MM-DD format
             const inputHtml = `
                 <div class="input-group">
-                    <label for="textInput">Bill Ref No:  <span class="text-danger">*</span> &nbsp </label>
+                    <label for="textInput">Bill Receipt Ref:  <span class="text-danger">*</span> &nbsp </label>
                     <input type="text" id="textInput" class="form-control" required>
                 </div><br>
                 <div class="input-group">

@@ -26,6 +26,7 @@ class Invoice extends Model
             'totalAmountInWords',
             'Tpn_no',
             'Bill_no',
+            'Receipt_no',
             'status',
             'bill_file',
             'academic_year',

@@ -16,13 +16,12 @@
             <form class="receipt-form">
                 <div class="row form-group">
                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                        <!-- re -->
+                        <label style="text-align: left;">Receipt No: <span><u>{{ this.Receipt_no }}</u></span></label>
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                        <label style="text-align: right;">Received Date: <span>{{ this.received_date }}</span></label>
+                        <label style="text-align: right;">Received Date: <span><u>{{ this.received_date }}</u></span></label>
                     </div>
-                </div>
-
+                </div><br>
                 <div class="row form-group">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <label>Received with thanks from : {{ this.addressTo }}</label>
@@ -52,12 +51,18 @@
                         <label>Amount Received in words: <span>{{ this.totalAmountInWords }}</span></label>
                     </div>
                 </div><br>
-                <div class="row form-group">
+                <div class="form-group">
                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                        <label>For New Edge (Signature): </label>
+                        <label>For New Edge (Signature):</label>
                     </div>
-                </div><br>
-                <hr>
+                </div>
+                <div class="form-group">
+                    <div class="signature-container col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <p class="signature-label">Received by: <span>{{ this.received_by }}</span></p>
+                        <img class="signature-image" :src="'images/' + this.E_Signature" alt="E-Signature">
+                    </div>
+                </div>
+                <div class="divider"></div>
                 <PrintDetails v-if="printing" :form="form" />
                 <div class="form-group row text-right d-print-none">
                     <div class="btn-group ml-auto mr-4 mt-2 mb-0">
@@ -84,8 +89,11 @@
                 totalAmount:0,
                 addressTo:'',
                 printing:false,
+                received_by:'',
                 totalAmountInWords:'',
                 isLoading:'',
+                E_Signature:'',
+                Receipt_no:'',
             }
         },
         methods:{
@@ -156,6 +164,30 @@
             Fire.$on('changefunction',(id)=> {
                 this.changefunction(id);
             });
+            axios.get('getSessionDetail')
+            .then((response) => {
+                let data = response.data.data;
+                this.received_by = data.name;
+                if(data.email == 'kinley.om@newedge.bt'){
+                    this.E_Signature = 'kinley.png';
+                }
+                else if(data.email == 'sanjeet.rai@newedge.bt'){
+                    this.E_Signature = 'sanjeet.png';
+                }
+                else if(data.email == 'bhakta.bomjan@newedge.bt'){
+                    this.E_Signature = 'ceo.png';
+                }
+                else if(data.email == 't.wangdi@newedge.bt'){
+                    this.E_Signature = 'thinley.png';
+                }
+                else{
+                    this.E_Signature ="general.png"
+                }
+            })
+            .catch((errors) => {
+            console.log(errors);
+            });
+            // "images/netlogo.png"
     
         },
         created(){
@@ -167,6 +199,7 @@
             this.totalAmount=this.$route.params.data.totalAmount;
             this.reference_number=this.$route.params.data.reference_number;
             this.tds=this.$route.params.data.tds;
+            this.Receipt_no=this.$route.params.data.Receipt_no;
             this.ConvertedIntoWords(this.amount_received);
             
         },
@@ -174,6 +207,45 @@
     </script>
     
     <style scoped>
+    .form-group {
+            margin-bottom: 15px;
+        }
+
+    .signature-container {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+        position: relative;
+    }
+
+    .signature-label {
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .signature-image {
+        max-width: 80%;
+        height: auto;
+        margin-top: 10px;
+        filter: grayscale(100%);
+        background-color: #fff;
+    }
+
+    .signature-highlight {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: white;
+        opacity: 0.8;
+        mix-blend-mode: difference;
+    }
+
+    .divider {
+        border-top: 1px solid #ccc;
+        margin: 20px 0;
+    }
     .money-receipt {
         font-family: Arial, sans-serif;
         max-width: 800px;

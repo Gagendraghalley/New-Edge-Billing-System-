@@ -38,7 +38,7 @@
                                         <thead>
                                             <tr>
                                                 <th style='font-weight: bold;font-family: "Times New Roman", Times, serif'>Sl.No</th>
-                                                <th style='font-weight: bold; width: 50%; font-family: "Times New Roman", Times, serif'>Particulars</th>
+                                                <th style='font-weight: bold;width: 50%; font-family: "Times New Roman", Times, serif'>Particulars</th>
                                                 <th style='font-weight: bold;width: 7%;font-family: "Times New Roman", Times, serif'>Quantity</th>
                                                 <th style='font-weight: bold;width: 15%;font-family: "Times New Roman", Times, serif'>Rate</th>
                                                 <th style='font-weight: bold;width: 20%;font-family: "Times New Roman", Times, serif'>Amount</th>
@@ -213,6 +213,7 @@ export default {
                 this.convertAmountToWords(); // Recalculate the total amount in words
             }
         },
+
         SaveDetails(){
             this.isLoading = true;
             this.form.post('create_invoice')
@@ -230,12 +231,14 @@ export default {
                 this.isLoading = false;
             });
         },
+
         remove_error(field_id){
             if($('#'+field_id).val()!=""){
                 $('#'+field_id).removeClass('is-invalid');
                 $('#'+field_id+'_err').html('');
             }
         },
+
         changefunction(id){
             if($('#'+id).val()!=""){
                 $('#'+id).removeClass('is-invalid select2');
@@ -247,6 +250,7 @@ export default {
             }
         }
     },
+
     async mounted(){
         $('.select2').select2();
         $('.select2').select2({

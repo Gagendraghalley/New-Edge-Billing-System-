@@ -92,16 +92,39 @@
                                         <tr>
                                             <td colspan="5">
                                                 <div class="bank-details">
-                                                <p class="bank-title"><u>Bank Details</u></p>
-                                                <ul class="bank-list">
-                                                    <li><span class="bank-name">BOB:</span> 100901568</li>
-                                                    <li><span class="bank-name">BNB:</span> 0000053343027</li>
-                                                    <li><span class="bank-name">BDB:</span> 201800025601</li>
-                                                    <li><span class="bank-name">DPNB:</span> 990210000556</li>
-                                                </ul>
+                                                    <p class="bank-title"><u>Bank Details</u></p>
+                                                    <ul class="bank-list">
+                                                        <li>
+                                                            <span class="bank-name">Beneficiary Name:</span>
+                                                            New Edge Technology Private Limited
+                                                        </li>
+                                                    </ul>
+                                                    <table class="bank-table">
+                                                        <tr>
+                                                            <th>Bank Name</th>
+                                                            <th>Bank Account</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Bank of Bhutan</td>
+                                                            <td>100901568</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Bhutan National Bank</td>
+                                                            <td>0000053343027</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Bhutan Development Bank</td>
+                                                            <td>201800025601</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Druk Punjap National Bank</td>
+                                                            <td>990210000556</td>
+                                                        </tr>
+                                                    </table>
                                                 </div>
                                             </td>
                                         </tr>
+
                                         <tr>
                                             <td colspan="5">
                                                 <p class="text-center"><b><u>Declaration</u> </b></p>
@@ -265,12 +288,16 @@ export default {
 }
 </script>
 <style>
+    .bank-table {
+            margin: 0 auto;
+        }
     .bank-details {
     margin-top: 10px;
     padding: 5px;
     background-color: #f8f9fa;
     border: 1px solid #ccc;
     border-radius: 5px;
+    text-align: center;
     }
 
 .bank-title {

@@ -554,7 +554,6 @@ class HomeController extends Controller
 
     //Updating bill
     public function Received($id=""){
-       
         $data = [
             'status'        => 'Received',
         ];
@@ -587,11 +586,45 @@ class HomeController extends Controller
                 // Handle the case where no invoice is found for the given ID
                 // For example, you can set a default value for $amount_received or show an error message.
             }
+            // generating ref number
+                $last_seq=ApplicationSequence::where('service_name','Receipt')->where('year', date('Y'))->first();
+                    if($last_seq==null || $last_seq==""){
+                        $last_seq=1;
+                        $app_details = [
+                            'service_name'                  =>  'Receipt',
+                            'last_sequence'                 =>  $last_seq,
+                            'year'                          =>  date('Y'),
+                        ];
+                        ApplicationSequence::create($app_details);
+                    }
+                    else{
+                        $last_seq=$last_seq->last_sequence+1;
+                        $app_details = [
+                            'last_sequence'                 =>  $last_seq,
+                        ];
+                        ApplicationSequence::where('service_name', 'Receipt')->update($app_details);
+                    }
+
+                    $application_no='NET/Receipt/';
+                    if(strlen($last_seq)==1){
+                        $application_no= $application_no.date('Y').'/000'.$last_seq;
+                    }
+                    else if(strlen($last_seq)==2){
+                        $application_no= $application_no.date('Y').'/00'.$last_seq;
+                    }
+                    else if(strlen($last_seq)==3){
+                        $application_no= $application_no.date('Y').'/0'.$last_seq;
+                    }
+                    else if(strlen($last_seq)==4){
+                        $application_no= $application_no.date('Y').'/'.$last_seq;
+                    }
+                
         //updating document path by id
             $update_file = [
                 'bill_file'         => $path,
                 'received_date'     => $request->dateOfRecieved,
                 'tds'               => $request->tds,
+                'Receipt_no'        => $application_no,
                 'amount_received'   => $amount_received,
                 'reference_number'  => $request->refNumber,
                 'reference_byId'    => Session::get('User_details')['id'],
