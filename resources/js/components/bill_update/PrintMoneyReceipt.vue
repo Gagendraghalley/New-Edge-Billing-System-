@@ -59,7 +59,8 @@
                 <div class="form-group">
                     <div class="signature-container col-lg-6 col-md-6 col-sm-6 col-xs-12">
                         <p class="signature-label">Received by: <span>{{ this.received_by }}</span></p>
-                        <img class="signature-image" :src="'images/' + this.E_Signature" alt="E-Signature">
+                        <img v-if="this.E_Signature" class="signature-image" :src="'images/' + this.E_Signature" alt="E-Signature">
+                        <img v-else class="signature-image" alt="No E-Signature">
                     </div>
                 </div>
                 <div class="divider"></div>
@@ -181,7 +182,7 @@
                     this.E_Signature = 'thinley.png';
                 }
                 else{
-                    this.E_Signature ="general.png"
+                    // this.E_Signature ="general.png"
                 }
             })
             .catch((errors) => {
